@@ -35,8 +35,7 @@ namespace CompliaShield.Encryption
         }
 
         #endregion
-
-
+        
         #region key generation
 
         public static string EncryptToBase64String(SecureString passwordToProtect, string keyId, RSACryptoServiceProvider publicKey)

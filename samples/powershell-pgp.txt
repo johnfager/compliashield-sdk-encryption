@@ -1,0 +1,15 @@
+# Define the file name for the data to be encrypted
+# The encrypted file will be the same path with the extension .gpg
+$filename = "C:\temp\sampledata-40M-pipe.txt"
+# Define the company key for the appropriate PGP key
+# NOTE: The company must have the data store API enabled and at least 1 PGP key generated
+$companykey = "testclientkey"
+# The resp of the variables are all set
+$keyactor = "datastore.api.cid." + $companykey
+$keysource = "https://apps.compliashield.com/ClientServices/certs/primary/" + $keyactor + ".asc"
+$keydestination = "C:\temp\" + $keyactor + ".asc"
+Invoke-WebRequest $keysource -OutFile $keydestination
+$outputfilename = $filename + ".gpg"
+$recipient = $actor + "@pgp.compliashield.com"
+gpg --import $keydestination
+gpg --trust-model always --recipient $recipient --output $outputfilename --encrypt $filename
