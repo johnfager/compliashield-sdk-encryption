@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompliaShield.Encryption", "CompliaShield.Encryption\CompliaShield.Encryption.csproj", "{C1FBA751-4812-4181-88DD-DE782C40E82B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompliaShield.Sdk.Cryptography", "CompliaShield.Sdk.Encryption\CompliaShield.Sdk.Cryptography.csproj", "{C1FBA751-4812-4181-88DD-DE782C40E82B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompliaShield.Encryption.Tests", "CompliaShield.Encryption.Tests\CompliaShield.Encryption.Tests.csproj", "{EEDFE3C2-92A2-4429-A008-FB2B95F0F125}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompliaShield.Sdk.Cryptography.Tests", "CompliaShield.Sdk.Encryption.Tests\CompliaShield.Sdk.Cryptography.Tests.csproj", "{EEDFE3C2-92A2-4429-A008-FB2B95F0F125}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
