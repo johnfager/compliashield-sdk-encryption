@@ -10,15 +10,29 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
     using CompliaShield.Sdk.Cryptography.Utilities;
 
     [Serializable]
-    public class AsymmetricallyEncryptedObject : AsymmetricEncryptionMetaData
+    public sealed class AsymmetricallyEncryptedObject : AsymmetricEncryptionMetaDataBase
     {
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public override string KeyId { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public override string Key2Id { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string CipherText { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public byte[] Data { get; set; }
-        
+
+        /// <summary>
+        /// Asymetrically encrypted password.
+        /// </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public override byte[] Reference { get; set; }
+
+        public override AsymmetricStrategyOption AsymmetricStrategy { get; set; }
+
         public override void LoadFromByteArray(byte[] input)
         {
             try
@@ -36,6 +50,16 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             {
                 throw new InvalidOperationException("input was not a validly serialized AsymmetricallyEncryptedObject", ex);
             }
+        }
+
+        public override byte[] ToByteArray()
+        {
+            if (string.IsNullOrEmpty(this.KeyId))
+            {
+                throw new InvalidOperationException("Cannot serialize to a byte array without a KeyId assigned.");
+            }
+            var json = Serializer.SerializeToJson(this); // removes the class specific typing
+            return Serializer.SerializeToByteArray(json);
         }
     }
 }

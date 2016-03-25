@@ -8,16 +8,17 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
     using System.Threading.Tasks;
     using Newtonsoft.Json;
     using CompliaShield.Sdk.Cryptography.Utilities;
+    using System.Runtime.Serialization;
 
     [Serializable]
-    public class AsymmetricEncryptionMetaData
+    public sealed class AsymmetricEncryptionMetaData : AsymmetricEncryptionMetaDataBase
     {
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public string KeyId { get; set; }
+        public override string KeyId { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public string Key2Id { get; set; }
+        public override string Key2Id { get; set; }
 
         //[JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         //public string SecretId { get; set; }
@@ -26,10 +27,11 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
         /// Asymetrically encrypted password.
         /// </summary>
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public byte[] Reference { get; set; }
-        public AsymmetricStrategyOption AsymmetricStrategy { get; set; }
+        public override byte[] Reference { get; set; }
 
-        public virtual void LoadFromByteArray(byte[] input)
+        public override AsymmetricStrategyOption AsymmetricStrategy { get; set; }
+
+        public override void LoadFromByteArray(byte[] input)
         {
             try
             {
@@ -47,7 +49,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             }
         }
 
-        public virtual byte[] ToByteArray()
+        public override byte[] ToByteArray()
         {
             if (string.IsNullOrEmpty(this.KeyId))
             {

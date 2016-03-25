@@ -217,6 +217,41 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         }
 
         [TestMethod]
+        public void TestAes1000WithCertificateAndSerialization()
+        {
+            var cert2 = LoadCertificate();
+
+            var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
+            var privateKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPrivateKey(cert2);
+
+            int length = 100;
+            var rand = new RandomGenerator();
+
+            //for (int i = 0; i < length; i++)
+            //{
+            //    var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
+            //    var asymEnc = new AsymmetricEncryptor(AsymmetricStrategyOption.Aes256_1000);
+            //    var asymObj = asymEnc.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToString().ToLower(), publicKey);
+            //    var decrypted = asymEnc.DecryptObject(asymObj, privateKey);
+            //    Assert.AreEqual(stringToEncrypt, decrypted);
+            //}
+
+            var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
+
+            var encryptor = new AsymmetricEncryptor() { AsymmetricStrategy = AsymmetricStrategyOption.Aes256_1000 };
+            var asymEncObj = encryptor.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToLower(), publicKey);
+            asymEncObj.KeyId = cert2.Thumbprint.ToLower(); 
+            var asymEncObjBytes = Serializer.SerializeToByteArray(asymEncObj);
+
+            // deserialize
+
+            var asymEncObj2 = Serializer.DeserializeFromByteArray(asymEncObjBytes) as AsymmetricallyEncryptedObject;
+            Assert.IsNotNull(asymEncObj);
+            Assert.IsTrue(!string.IsNullOrEmpty(asymEncObj.KeyId));
+
+        }
+
+        [TestMethod]
         public void TestAes1000WithCertificate()
         {
             var cert2 = LoadCertificate();
