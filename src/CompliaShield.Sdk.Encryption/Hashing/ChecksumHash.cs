@@ -1,7 +1,6 @@
 
 namespace CompliaShield.Sdk.Cryptography.Hashing
 {
-    using CompliaShield.Sdk.Cryptography.Utilities;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -10,6 +9,7 @@ namespace CompliaShield.Sdk.Cryptography.Hashing
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
+    using CompliaShield.Sdk.Cryptography.Utilities;
 
     public static class ChecksumHash
     {
