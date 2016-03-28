@@ -15,7 +15,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
     using CompliaShield.Sdk.Cryptography.Utilities;
 
 
-    public class AsymmetricEncryptor
+    public sealed class AsymmetricEncryptor
     {
 
         public AsymmetricStrategyOption AsymmetricStrategy { get; set; }

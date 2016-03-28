@@ -15,7 +15,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
     /// </summary>
     /// <remarks></remarks>
     [Obsolete("BasicEncryptor is obsolete. Use AesEncryptor instead.")]
-    public class BasicEncryptor
+    public sealed class BasicEncryptor
     {
 
         /// <summary> 

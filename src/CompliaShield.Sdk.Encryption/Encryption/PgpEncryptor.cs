@@ -12,7 +12,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
     using Org.BouncyCastle.Security;
     using CompliaShield.Sdk.Cryptography.Utilities;
 
-    public class PgpEncryptor
+    public sealed class PgpEncryptor
     {
 
         #region methods

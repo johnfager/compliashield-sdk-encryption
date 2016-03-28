@@ -13,7 +13,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
     using CompliaShield.Sdk.Cryptography.Utilities;
 
 
-    public class AesEncryptor
+    public sealed class AesEncryptor
     {
         #region basic
 
