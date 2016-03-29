@@ -58,6 +58,11 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
         public bool VerifyMd5Hash(string hashHex, byte[] signedBytes)
         {
             var hashedBytes = Format.HexStringToByteArray(hashHex);
+            return this.VerifyMd5Hash(hashedBytes, signedBytes);
+        }
+
+        public bool VerifyMd5Hash(byte[] hashedBytes, byte[] signedBytes)
+        {
             var isValid = _publicKey.VerifyHash(hashedBytes, CryptoConfig.MapNameToOID("MD5"), signedBytes);
             return isValid;
         }
@@ -87,6 +92,12 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
         public bool VerifySha1Hash(string hashHex, byte[] signedBytes)
         {
             var hashedBytes = Format.HexStringToByteArray(hashHex);
+            return this.VerifySha1Hash(hashedBytes, signedBytes);
+        }
+
+
+        public bool VerifySha1Hash(byte[] hashedBytes, byte[] signedBytes)
+        {
             var isValid = _publicKey.VerifyHash(hashedBytes, CryptoConfig.MapNameToOID("SHA1"), signedBytes);
             return isValid;
         }

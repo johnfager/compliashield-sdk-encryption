@@ -14,11 +14,10 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
     using System.Xml.Serialization;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
-    
-    public class Serializer
-    {   
 
-        
+    public class Serializer
+    {
+
         public static string SerializeToJson(object obj)
         {
             return SerializeToJson(obj, false);
@@ -79,14 +78,14 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
         {
             return JsonConvert.DeserializeObject(jsonText, type);
         }
-        
+
         public static T DeserializeFromJson<T>(string jsonText) where T : class
         {
             var type = typeof(T);
             return (T)DeserializeFromJson(jsonText, type);
             // return DeserializeFromJson<T>(jsonText, false);
         }
-        
+
         /// <summary>
         /// Puts a serializable object to an XML string
         /// </summary>

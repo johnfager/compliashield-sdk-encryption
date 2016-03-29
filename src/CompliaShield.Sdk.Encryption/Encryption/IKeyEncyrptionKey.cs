@@ -13,6 +13,8 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
     /// </summary>
     public interface IKeyEncyrptionKey : IDisposable
     {
+        string KeyId { get; }
+
         Task<byte[]> UnwrapKeyAsync(byte[] encryptedKey);
 
         Task<byte[]> UnwrapKeyAsync(byte[] encryptedKey, CancellationToken token);
@@ -20,6 +22,10 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
         Task<Tuple<byte[], string>> SignAsync(byte[] digest, string algorithm);
 
         Task<Tuple<byte[], string>> SignAsync(byte[] digest, string algorithm, CancellationToken token);
+
+        Task<bool> VerifyAsync(byte[] digest, byte[] signature, string algorithm);
+
+        Task<bool> VerifyAsync(byte[] digest, byte[] signature, string algorithm, CancellationToken token);
 
     }
 }
