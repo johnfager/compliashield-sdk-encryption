@@ -13,7 +13,7 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
     using Org.BouncyCastle.Crypto.Parameters;
     using Org.BouncyCastle.OpenSsl;
     using Org.BouncyCastle.Security;
-    using Encryption;
+    using Encryption.Keys;
 
     public static class X509CertificateHelper
     {
@@ -22,7 +22,7 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
         {
             return new X509Certificate2KeyEncryptionKey(x509Certificate2);
         }
-        
+
         public static RSACryptoServiceProvider GetRSACryptoServiceProviderFromPrivateKey(X509Certificate2 x509Certificate2)
         {
             if (x509Certificate2 == null)
@@ -60,7 +60,7 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
             {
                 throw new ArgumentException("x509Certificate2.PublicKey.Key must be populated.");
             }
-            
+
             try
             {
                 var rsa = x509Certificate2.PublicKey.Key as RSACryptoServiceProvider;
@@ -142,5 +142,22 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
             return rsa;
         }
 
+        /// <summary>
+        /// Export a certificate to a PEM format string
+        /// </summary>
+        /// <param name="cert">The certificate to export</param>
+        /// <returns>A PEM encoded string</returns>
+        public static string ExportToPEM(X509Certificate cert)
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine("-----BEGIN CERTIFICATE-----");
+            var bytes = cert.Export(X509ContentType.Cert);
+            builder.AppendLine(Convert.ToBase64String(bytes, Base64FormattingOptions.InsertLineBreaks));
+            builder.AppendLine("-----END CERTIFICATE-----");
+            var output = builder.ToString();
+            // just a single newline
+            output = output.Replace(Environment.NewLine, "\n");
+            return output;
+        }
     }
 }

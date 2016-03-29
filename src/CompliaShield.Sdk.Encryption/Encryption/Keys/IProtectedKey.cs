@@ -1,5 +1,5 @@
 
-namespace CompliaShield.Sdk.Cryptography.Encryption
+namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 {
     using System;
     using System.Threading.Tasks;
@@ -9,7 +9,11 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
 
         //IKeyEncyrptionKey KeyProtectionKey { get; }
 
-        //AsymmetricallyEncryptedObject 
+        //AsymmetricallyEncryptedObject
+
+        string KeyId { get; }
+
+        Task<byte[]> ToByteArrayAsync();
 
         Task<IKeyEncyrptionKey> ToKeyEncyrptionKeyAsync(IKeyEncyrptionKey keyProtector);
 

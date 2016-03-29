@@ -1,5 +1,5 @@
 
-namespace CompliaShield.Sdk.Cryptography.Encryption
+namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 {
     using System;
     using System.Collections.Generic;
@@ -19,6 +19,15 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
         private bool _isDisposed;
 
         public string KeyId { get; private set; }
+
+        public PublicKey PublicKey
+        {
+            get
+            {
+                this.EnsureNotDisposed();
+                return _x5092.PublicKey;
+            }
+        }
 
         #region .ctors
 
@@ -134,6 +143,12 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
                 default:
                     throw new NotImplementedException(string.Format("algorithm '{0}' is not implemented.", algorithm));
             }
+        }
+
+        public string PublicKeyToPEM()
+        {
+            this.EnsureNotDisposed();
+            return X509CertificateHelper.ExportToPEM(_x5092);
         }
 
         public void Dispose()

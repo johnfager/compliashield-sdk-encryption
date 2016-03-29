@@ -23,6 +23,7 @@ namespace CompliaShield.Sdk.X509Certificates
     using Org.BouncyCastle.Security;
     using Org.BouncyCastle.X509;
     using Cryptography.Encryption;
+    using Cryptography.Encryption.Keys;
     using Cryptography.Utilities;
 
     public sealed class ProtectedX509Certificate2Generator
@@ -45,12 +46,7 @@ namespace CompliaShield.Sdk.X509Certificates
         #region methods
 
         public async Task<IProtectedKey> IssueNewCertificateAsync(IPublicKey keyProtector, ICertificatePolicy certificatePolicy)
-        {
-
-            //if(keyProtectorKeyThumbprint == null)
-            //{
-            //    throw new ArgumentNullException("keyProtectorKeyThumbprint");
-            //}
+        {            
             if (keyProtector == null)
             {
                 throw new ArgumentNullException("keyProtectorPublicKey");
@@ -83,7 +79,7 @@ namespace CompliaShield.Sdk.X509Certificates
             {
                 throw new InvalidOperationException("AsymmetricEncryptor.EncryptObject returned without KeyId populated.");
             }
-            var protectedKey = new AsymmetricallyEncryptedProtectedKey(asymEncObj);
+            var protectedKey = new ProtectedX509Certificate2(x509Certificate2.Thumbprint.ToLower(), asymEncObj);
             return await Task.FromResult(protectedKey);
         }
 

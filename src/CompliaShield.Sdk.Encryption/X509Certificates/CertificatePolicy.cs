@@ -46,18 +46,18 @@ namespace CompliaShield.Sdk.X509Certificates
 
         #region .ctors
 
-        public CertificatePolicy(Dictionary<string, string> x509NameDictionary)
-        {
-            // don't bother initializing if no data
-            if (x509NameDictionary != null && !x509NameDictionary.Any())
-            {
-                this.X509NameDictionary = null;
-            }
-            else
-            {
-                this.X509NameDictionary = x509NameDictionary;
-            }
-        }
+        //public CertificatePolicy(Dictionary<string, string> x509NameDictionary)
+        //{
+        //    // don't bother initializing if no data
+        //    if (x509NameDictionary != null && !x509NameDictionary.Any())
+        //    {
+        //        this.X509NameDictionary = null;
+        //    }
+        //    else
+        //    {
+        //        this.X509NameDictionary = x509NameDictionary;
+        //    }
+        //}
         
         public void Load(ICertificatePolicy input)
         {
