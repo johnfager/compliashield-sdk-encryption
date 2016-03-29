@@ -41,6 +41,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -51,6 +52,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Encryption\Keys\ProtectedX509Certificate2.cs" />
+    <Compile Include="Encryption\Keys\IProtectedKey.cs" />
+    <Compile Include="Encryption\Keys\IPublicKey.cs" />
+    <Compile Include="Utilities\StringWriterWithEncoding.cs" />
+    <Compile Include="X509Certificates\CertificatePolicy.cs" />
+    <Compile Include="X509Certificates\ICertificatePolicy.cs" />
+    <Compile Include="X509Certificates\ProtectedX509Certificate2Generator.cs" />
     <Compile Include="Encryption\AesEncryptor.cs" />
     <Compile Include="Encryption\AsymmetricallyEncryptedObject.cs" />
     <Compile Include="Encryption\AsymmetricEncryptionMetaData.cs" />
@@ -58,8 +66,8 @@
     <Compile Include="Encryption\AsymmetricStrategyOption.cs" />
     <Compile Include="Encryption\BasicEncryptor.cs" />
     <Compile Include="Encryption\AsymmetricEncryptionMetaDataBase.cs" />
-    <Compile Include="Encryption\IKeyEncyrptionKey.cs" />
-    <Compile Include="Encryption\X509Certificate2KeyEncryptionKey.cs" />
+    <Compile Include="Encryption\Keys\IKeyEncyrptionKey.cs" />
+    <Compile Include="Encryption\Keys\X509Certificate2KeyEncryptionKey.cs" />
     <Compile Include="Hashing\BasicHasher.cs" />
     <Compile Include="Hashing\ChecksumHash.cs" />
     <Compile Include="Encryption\EncryptionException.cs" />
@@ -81,9 +89,7 @@
     <Compile Include="Utilities\RegExPatterns.cs" />
     <Compile Include="Utilities\Serializer.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Certificates\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="_CreateNewNuGetPackage\Config.ps1" />

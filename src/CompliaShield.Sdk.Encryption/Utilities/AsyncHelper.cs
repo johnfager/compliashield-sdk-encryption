@@ -8,7 +8,7 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
     using System.Threading;
     using System.Threading.Tasks;
 
-    public static class AsyncHelper
+    internal static class AsyncHelper
     {
 
         /// <summary>

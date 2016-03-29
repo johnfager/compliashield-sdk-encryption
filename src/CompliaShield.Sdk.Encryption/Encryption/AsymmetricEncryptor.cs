@@ -10,7 +10,8 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
-
+    
+    using CompliaShield.Sdk.Cryptography.Encryption.Keys;
     using CompliaShield.Sdk.Cryptography.Extensions;
     using CompliaShield.Sdk.Cryptography.Utilities;
 

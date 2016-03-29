@@ -15,11 +15,10 @@ namespace CompliaShield.Sdk.Cryptography.Tests
     using Encryption;
 
     [TestClass]
-    public class TestEncryption
+    public class TestEncryption : _baseTest
     {
 
-        private const string CERT_FOLDER = @"cert\";
-        
+
         [TestMethod]
         public void TestProtectPassword()
         {
@@ -96,9 +95,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
                 }
             }
         }
-
-
-
+        
         [TestMethod]
         public void TestAes1000()
         {
@@ -239,7 +236,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
             var encryptor = new AsymmetricEncryptor() { AsymmetricStrategy = AsymmetricStrategyOption.Aes256_1000 };
             var asymEncObj = encryptor.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToLower(), publicKey);
-            asymEncObj.KeyId = cert2.Thumbprint.ToLower(); 
+            asymEncObj.KeyId = cert2.Thumbprint.ToLower();
             var asymEncObjBytes = Serializer.SerializeToByteArray(asymEncObj);
 
             // deserialize
@@ -367,89 +364,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
                 Assert.AreEqual(stringToEncrypt, decrypted);
             }
         }
-        
-        #region helpers
 
-        private void CheckLineLengthDifferences(FileInfo fiTempEncrypted, StringBuilder stb)
-        {
-
-            var dic = new Dictionary<int, string>();
-
-            // base 64
-            var lines = File.ReadLines(fiTempEncrypted.FullName + ".txt");
-
-            int i = 1;
-            foreach (var line in lines)
-            {
-                dic[i] = line.Length.ToString();
-                i++;
-            }
-
-            lines = File.ReadLines(fiTempEncrypted.FullName + ".base64");
-            i = 1;
-            foreach (var line in lines)
-            {
-                dic[i] += "\t" + line.Length.ToString();
-                i++;
-            }
-
-            lines = File.ReadLines(fiTempEncrypted.FullName + ".base36");
-            i = 1;
-            foreach (var line in lines)
-            {
-                dic[i] += "\t" + line.Length.ToString();
-                i++;
-            }
-
-            stb.AppendLine();
-            stb.AppendLine("--------------------");
-            stb.AppendLine();
-
-            stb.AppendLine("Line\tlenPlain\tlen64\tlen36");
-
-            foreach (var item in dic)
-            {
-                stb.AppendLine(item.Key.ToString() + "\t" + item.Value);
-            }
-
-            File.WriteAllText(fiTempEncrypted.FullName + "_report.txt", stb.ToString());
-        }
-
-        private static X509Certificate2 LoadCertificate()
-        {
-            string pfxFilePath = (CERT_FOLDER + "DO_NOT_TRUST Testing.pfx");
-            if (!File.Exists(pfxFilePath))
-            {
-                throw new FileNotFoundException("Could not load PFX file at path: " + pfxFilePath);
-            }
-            string pfxPwFilePath = CERT_FOLDER + "DO_NOT_TRUST Testing_password.txt";
-            if (!File.Exists(pfxPwFilePath))
-            {
-                throw new FileNotFoundException("Could not load PFX password file at path: " + pfxPwFilePath);
-            }
-            string pfxPw = File.ReadAllText(pfxPwFilePath);
-            var cert2 = new X509Certificate2(pfxFilePath, pfxPw, X509KeyStorageFlags.Exportable);
-            return cert2;
-        }
-
-        private static X509Certificate2 LoadCertificate2()
-        {
-            string pfxFilePath = (CERT_FOLDER + "DO_NOT_TRUST Testing2.pfx");
-            if (!File.Exists(pfxFilePath))
-            {
-                throw new FileNotFoundException("Could not load PFX file at path: " + pfxFilePath);
-            }
-            string pfxPwFilePath = CERT_FOLDER + "DO_NOT_TRUST Testing2_password.txt";
-            if (!File.Exists(pfxPwFilePath))
-            {
-                throw new FileNotFoundException("Could not load PFX password file at path: " + pfxPwFilePath);
-            }
-            string pfxPw = File.ReadAllText(pfxPwFilePath);
-            var cert2 = new X509Certificate2(pfxFilePath, pfxPw, X509KeyStorageFlags.Exportable);
-            return cert2;
-        }
-
-        #endregion
     }
 
 }

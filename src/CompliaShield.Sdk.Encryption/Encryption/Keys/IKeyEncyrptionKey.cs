@@ -1,5 +1,5 @@
 
-namespace CompliaShield.Sdk.Cryptography.Encryption
+namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 {
     using System;
     using System.Collections.Generic;
@@ -11,8 +11,10 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
     /// <summary>
     /// Abstracts the action of handling unwrapping an encrypted key or signing, allowing for offsite or API access to external key stores including HSM protected key encryption keys.
     /// </summary>
-    public interface IKeyEncyrptionKey : IDisposable
+    public interface IKeyEncyrptionKey : IPublicKey
     {
+        //string KeyId { get; }
+
         Task<byte[]> UnwrapKeyAsync(byte[] encryptedKey);
 
         Task<byte[]> UnwrapKeyAsync(byte[] encryptedKey, CancellationToken token);
