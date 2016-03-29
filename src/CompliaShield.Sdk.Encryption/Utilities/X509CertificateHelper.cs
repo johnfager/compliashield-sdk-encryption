@@ -1,6 +1,7 @@
 
 namespace CompliaShield.Sdk.Cryptography.Utilities
 {
+    using Encryption;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -11,6 +12,13 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
 
     public static class X509CertificateHelper
     {
+
+        public static IKeyEncyrptionKey GetKeyEncryptionKey(X509Certificate2 x509Certificate2)
+        {
+            return new X509Certificate2KeyEncryptionKey(x509Certificate2);
+        }
+
+
         public static RSACryptoServiceProvider GetRSACryptoServiceProviderFromPrivateKey(X509Certificate2 x509Certificate2)
         {
             if (x509Certificate2 == null)

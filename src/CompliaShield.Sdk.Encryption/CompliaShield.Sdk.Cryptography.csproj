@@ -58,6 +58,8 @@
     <Compile Include="Encryption\AsymmetricStrategyOption.cs" />
     <Compile Include="Encryption\BasicEncryptor.cs" />
     <Compile Include="Encryption\AsymmetricEncryptionMetaDataBase.cs" />
+    <Compile Include="Encryption\IKeyEncyrptionKey.cs" />
+    <Compile Include="Encryption\X509Certificate2KeyEncryptionKey.cs" />
     <Compile Include="Hashing\BasicHasher.cs" />
     <Compile Include="Hashing\ChecksumHash.cs" />
     <Compile Include="Encryption\EncryptionException.cs" />
@@ -68,6 +70,7 @@
     <Compile Include="Encryption\Signing\Signer.cs" />
     <Compile Include="Encryption\Signing\Verifier.cs" />
     <Compile Include="Hashing\HasherRfc2898.cs" />
+    <Compile Include="Utilities\AsyncHelper.cs" />
     <Compile Include="Utilities\StreamHelper.cs" />
     <Compile Include="Utilities\X509CertificateHelper.cs" />
     <Compile Include="Hashing\MD5HashGenerator.cs" />

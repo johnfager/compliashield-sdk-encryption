@@ -20,13 +20,12 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
         private const string CERT_FOLDER = @"cert\";
         
-
         [TestMethod]
         public void TestProtectPassword()
         {
             var cert2 = LoadCertificate();
             var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPrivateKey(cert2);
+            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -62,11 +61,11 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         {
             var cert2 = LoadCertificate();
             var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPrivateKey(cert2);
+            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
 
             var cert2Dual = LoadCertificate2();
             var publicKey2 = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2Dual);
-            var privateKey2 = X509CertificateHelper.GetRSACryptoServiceProviderFromPrivateKey(cert2Dual);
+            var privateKey2 = X509CertificateHelper.GetKeyEncryptionKey(cert2Dual);
 
 
             int length = 100;
@@ -201,7 +200,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             var cert2 = LoadCertificate();
 
             var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPrivateKey(cert2);
+            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -222,7 +221,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             var cert2 = LoadCertificate();
 
             var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPrivateKey(cert2);
+            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -257,7 +256,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             var cert2 = LoadCertificate();
 
             var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPrivateKey(cert2);
+            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -278,7 +277,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             var cert2 = LoadCertificate();
 
             var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPrivateKey(cert2);
+            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -300,11 +299,11 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
             var cert2 = LoadCertificate();
             var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPrivateKey(cert2);
+            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
 
             var cert2Dual = LoadCertificate2();
             var publicKey2 = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2Dual);
-            var privateKey2 = X509CertificateHelper.GetRSACryptoServiceProviderFromPrivateKey(cert2Dual);
+            var privateKey2 = X509CertificateHelper.GetKeyEncryptionKey(cert2Dual);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -325,11 +324,11 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
             var cert2 = LoadCertificate();
             var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPrivateKey(cert2);
+            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
 
             var cert2Dual = LoadCertificate2();
             var publicKey2 = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2Dual);
-            var privateKey2 = X509CertificateHelper.GetRSACryptoServiceProviderFromPrivateKey(cert2Dual);
+            var privateKey2 = X509CertificateHelper.GetKeyEncryptionKey(cert2Dual);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -350,11 +349,11 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
             var cert2 = LoadCertificate();
             var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPrivateKey(cert2);
+            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
 
             var cert2Dual = LoadCertificate2();
             var publicKey2 = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2Dual);
-            var privateKey2 = X509CertificateHelper.GetRSACryptoServiceProviderFromPrivateKey(cert2Dual);
+            var privateKey2 = X509CertificateHelper.GetKeyEncryptionKey(cert2Dual);
 
             int length = 100;
             var rand = new RandomGenerator();

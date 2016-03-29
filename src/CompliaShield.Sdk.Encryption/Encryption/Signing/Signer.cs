@@ -69,6 +69,23 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
             }
         }
 
+        public Tuple<byte[], string> SignMd5(byte[] hashedBytes)
+        {
+            var signedHash = _privateKey.SignHash(hashedBytes, CryptoConfig.MapNameToOID("MD5"));
+            if (_encoding == EncodingOption.Base64String)
+            {
+                return new Tuple<byte[], string>(signedHash, Convert.ToBase64String(signedHash));
+            }
+            else if (_encoding == EncodingOption.HexString)
+            {
+                return new Tuple<byte[], string>(signedHash, signedHash.ToHexString());
+            }
+            else
+            {
+                throw new NotImplementedException(_encoding.ToString());
+            }
+        }
+
         #endregion
 
         #region SHA1
@@ -89,6 +106,23 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
             else if (_encoding == EncodingOption.HexString)
             {
                 return signedHash.ToHexString();
+            }
+            else
+            {
+                throw new NotImplementedException(_encoding.ToString());
+            }
+        }
+
+        public Tuple<byte[], string> SignSha1(byte[] hashedBytes)
+        {
+            var signedHash = _privateKey.SignHash(hashedBytes, CryptoConfig.MapNameToOID("SHA1"));
+            if (_encoding == EncodingOption.Base64String)
+            {
+                return new Tuple<byte[], string>(signedHash, Convert.ToBase64String(signedHash));
+            }
+            else if (_encoding == EncodingOption.HexString)
+            {
+                return new Tuple<byte[], string>(signedHash, signedHash.ToHexString());
             }
             else
             {

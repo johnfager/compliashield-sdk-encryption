@@ -35,7 +35,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
         }
 
         #endregion
-        
+
         #region key generation
 
         public static string EncryptToBase64String(SecureString passwordToProtect, string keyId, RSACryptoServiceProvider publicKey)
@@ -54,7 +54,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             // Use a 4-byte array to fill it with random bytes and convert it then
             // to an integer value.
             byte[] plainBytes;
-            byte[] encryptedBytes = null;
+            //byte[] encryptedBytes = null;
 
             plainBytes = passwordToProtect.ToByteArray();
 
@@ -65,11 +65,14 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             return Convert.ToBase64String(bytes);
         }
 
-
-
-        public static SecureString DecryptFromBase64String(string encryptedValueAsBase64String, RSACryptoServiceProvider privateKey)
+        public static SecureString DecryptFromBase64String(string encryptedValueAsBase64String, IKeyEncyrptionKey privateKey)
         {
             return DecryptFromBase64String(encryptedValueAsBase64String, privateKey, null);
+        }
+
+        public static SecureString DecryptFromBase64String(string encryptedValueAsBase64String, IKeyEncyrptionKey privateKey1, IKeyEncyrptionKey privateKey2)
+        {
+            return AsyncHelper.RunSync(() => DecryptFromBase64StringAsync(encryptedValueAsBase64String, privateKey1, privateKey2));
         }
 
         /// <summary>
@@ -78,7 +81,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
         /// <param name="encryptedValueAsBase64String"></param>
         /// <param name="privateKey"></param>
         /// <returns></returns>
-        public static SecureString DecryptFromBase64String(string encryptedValueAsBase64String, RSACryptoServiceProvider privateKey1, RSACryptoServiceProvider privateKey2)
+        public static async Task<SecureString> DecryptFromBase64StringAsync(string encryptedValueAsBase64String, IKeyEncyrptionKey privateKey1, IKeyEncyrptionKey privateKey2)
         {
 
             if (string.IsNullOrEmpty(encryptedValueAsBase64String))
@@ -95,7 +98,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
 
             // deserialize the object
             var asymEnc = new AsymmetricEncryptor();
-            plainBytes = (byte[])asymEnc.DecryptObject(asymEncObj, privateKey1, privateKey2);
+            plainBytes = (byte[])await asymEnc.DecryptObjectAsync(asymEncObj, privateKey1, privateKey2);
 
             var secureString = new SecureString();
             var chars = System.Text.Encoding.UTF8.GetChars(plainBytes);
@@ -124,14 +127,24 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             return this.EncryptObject_Private(input, key1Id, publicKey1, key2Id, publicKey2);
         }
 
-        public object DecryptObject(AsymmetricallyEncryptedObject input, RSACryptoServiceProvider privateKey)
+        public object DecryptObject(AsymmetricallyEncryptedObject input, IKeyEncyrptionKey privateKey)
         {
-            return this.DecryptObject_Private(input, privateKey, null);
+            return AsyncHelper.RunSync(() => this.DecryptObjectAsync(input, privateKey));
         }
 
-        public object DecryptObject(AsymmetricallyEncryptedObject input, RSACryptoServiceProvider privateKey1, RSACryptoServiceProvider privateKey2)
+        public async Task<object> DecryptObjectAsync(AsymmetricallyEncryptedObject input, IKeyEncyrptionKey privateKey)
         {
-            return this.DecryptObject_Private(input, privateKey1, privateKey2);
+            return await this.DecryptObject_PrivateAsync(input, privateKey, null);
+        }
+
+        public object DecryptObject(AsymmetricallyEncryptedObject input, IKeyEncyrptionKey privateKey1, IKeyEncyrptionKey privateKey2)
+        {
+            return AsyncHelper.RunSync(() => this.DecryptObject_PrivateAsync(input, privateKey1, privateKey2));
+        }
+
+        public async Task<object> DecryptObjectAsync(AsymmetricallyEncryptedObject input, IKeyEncyrptionKey privateKey1, IKeyEncyrptionKey privateKey2)
+        {
+            return await this.DecryptObject_PrivateAsync(input, privateKey1, privateKey2);
         }
 
         #region helpers
@@ -152,16 +165,36 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             }
 
             // password lengths
-            var pwMinLen = 32;
-            var pwMaxLen = 40;
+
+
+
+            int pwLen = 32;
+            //var pwMinLen = pwLen;
+            //var pwMaxLen = pwLen; // 40;
+
             if (this.AsymmetricStrategy == AsymmetricStrategyOption.Aes256_1000)
             {
-                // up the pw size
-                pwMinLen = 40;
-                pwMaxLen = 65;
+                pwLen = 40;
+                //// up the pw size
+                //pwMinLen = 40;
+                //pwMaxLen = 40;
             }
             var rand = new RandomGenerator();
-            var pwLen = rand.RandomNumber(pwMinLen, pwMaxLen);
+
+            //if (pwMinLen < 32)
+            //{
+            //    throw new NotImplementedException("pwMinLen is at least 32 bytes");
+            //}
+
+            //if (pwMinLen == pwMaxLen)
+            //{
+            //    pwLen = pwMaxLen;
+            //}
+            //else
+            //{
+            //    pwLen = rand.RandomNumber(pwMinLen, pwMaxLen);
+            //}
+
 
             byte[] passPhraseAsBytes = null;
             byte[] passPhrase2AsBytes = null;
@@ -172,11 +205,11 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             if (this.AsymmetricStrategy == AsymmetricStrategyOption.Legacy_Aes2)
             {
                 // legacy uses a string
-                passPhrase = rand.RandomPassword(pwMinLen, pwMaxLen);
+                passPhrase = rand.RandomPassword(pwLen); // pwMinLen, pwMaxLen);
                 passPhraseAsBytes = Serializer.SerializeToByteArray(passPhrase);
                 if (publicKey2 != null)
                 {
-                    passPhrase2 = rand.RandomPassword(pwMinLen, pwMaxLen);
+                    passPhrase2 = rand.RandomPassword(pwLen); // pwMinLen, pwMaxLen);
                     passPhrase2AsBytes = Serializer.SerializeToByteArray(passPhrase2);
                 }
             }
@@ -272,7 +305,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             public byte[] EncryptedPassphrase2 { get; set; }
         }
 
-        private object DecryptObject_Private(AsymmetricallyEncryptedObject input, RSACryptoServiceProvider privateKey1, RSACryptoServiceProvider privateKey2)
+        private async Task<object> DecryptObject_PrivateAsync(AsymmetricallyEncryptedObject input, IKeyEncyrptionKey privateKey1, IKeyEncyrptionKey privateKey2)
         {
 
             // Variables
@@ -283,7 +316,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             string passPhrase = null; // used for the legacy
             if (privateKey2 == null)
             {
-                passphraseAsBytes = privateKey1.Decrypt(encryptedPassphraseAsBytes, false);
+                passphraseAsBytes = await privateKey1.UnwrapKeyAsync(encryptedPassphraseAsBytes);
                 if (input.AsymmetricStrategy == AsymmetricStrategyOption.Legacy_Aes2)
                 {
                     passPhrase = (string)Serializer.DeserializeFromByteArray(passphraseAsBytes);
@@ -294,8 +327,8 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
                 var dualPwJson = Encoding.UTF8.GetString(encryptedPassphraseAsBytes);
                 var dualPw = Serializer.DeserializeFromJson<DualKeyProtectedPassword>(dualPwJson);
 
-                var passPhrase1Bytes = privateKey1.Decrypt(dualPw.EncryptedPassphrase1, false);
-                var passPhrase2Bytes = privateKey2.Decrypt(dualPw.EncryptedPassphrase2, false);
+                var passPhrase1Bytes = await privateKey1.UnwrapKeyAsync(dualPw.EncryptedPassphrase1);
+                var passPhrase2Bytes = await privateKey2.UnwrapKeyAsync(dualPw.EncryptedPassphrase2);
 
                 if (input.AsymmetricStrategy == AsymmetricStrategyOption.Legacy_Aes2)
                 {
