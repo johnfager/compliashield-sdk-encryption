@@ -45,7 +45,7 @@ namespace CompliaShield.Sdk.X509Certificates
 
         #region methods
 
-        public async Task<IProtectedKey> IssueNewCertificateAsync(IPublicKey keyProtector, ICertificatePolicy certificatePolicy)
+        public async Task<ProtectedX509Certificate2> IssueNewCertificateAsync(IPublicKey keyProtector, ICertificatePolicy certificatePolicy)
         {            
             if (keyProtector == null)
             {

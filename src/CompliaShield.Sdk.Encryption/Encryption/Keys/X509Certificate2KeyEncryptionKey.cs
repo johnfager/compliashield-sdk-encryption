@@ -11,14 +11,42 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
     using System.Threading.Tasks;
     using Utilities;
 
-    public partial class X509Certificate2KeyEncryptionKey : IKeyEncyrptionKey
+    public sealed class X509Certificate2KeyEncryptionKey : IKeyEncyrptionKey
     {
 
         private X509Certificate2 _x5092;
 
         private bool _isDisposed;
 
+        public bool IsDisposed { get { return _isDisposed; } }
+
         public string KeyId { get; private set; }
+
+        public DateTime NotBefore
+        {
+            get
+            {
+                if(_x5092 == null)
+                {
+                    // max value means it should not be used
+                    return DateTime.MaxValue;
+                }
+                return _x5092.NotBefore;
+            }
+        }
+        
+        public DateTime NotAfter
+        {
+            get
+            {
+                if (_x5092 == null)
+                {
+                    // min value means it should not be used
+                    return DateTime.MinValue;
+                }
+                return _x5092.NotAfter;
+            }
+        }
 
         public PublicKey PublicKey
         {

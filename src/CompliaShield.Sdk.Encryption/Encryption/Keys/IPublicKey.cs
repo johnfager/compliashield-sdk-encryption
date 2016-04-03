@@ -10,6 +10,10 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
     {
         string KeyId { get; }
 
+        DateTime NotBefore { get; }
+
+        DateTime NotAfter { get; }
+
         PublicKey PublicKey { get; }
 
         Task<bool> VerifyAsync(byte[] digest, byte[] signature, string algorithm);
