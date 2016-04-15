@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Encryption\Keys\PgpPublicKeyMetaData.cs" />
     <Compile Include="Encryption\Keys\ProtectedX509Certificate2.cs" />
     <Compile Include="Encryption\Keys\IProtectedKey.cs" />
     <Compile Include="Encryption\Keys\IPublicKey.cs" />

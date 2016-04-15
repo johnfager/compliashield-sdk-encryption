@@ -6,11 +6,49 @@ namespace CompliaShield.Sdk.Cryptography.Tests
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Org.BouncyCastle.Bcpg.OpenPgp;
+    using Newtonsoft.Json;
     using Encryption;
+    using Encryption.Keys;
+
 
     [TestClass]
     public class TestPgpEncryption
     {
+        [TestMethod]
+        public void TestLoadKeyMetaData()
+        {
+            var fi = new FileInfo(@"cert\FA283393.asc");
+            if (!fi.Exists)
+            {
+                throw new FileNotFoundException(fi.FullName);
+            }
+
+            using (var stream = File.OpenRead(fi.FullName))
+            {
+                foreach (var key in PgpPublicKeyMetaData.GetPublicKeys(stream))
+                {
+                    Console.WriteLine(JsonConvert.SerializeObject(key, Formatting.Indented));
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestLoadKeyMetaDataHeirarchical()
+        {
+            var fi = new FileInfo(@"cert\FA283393.asc");
+            if (!fi.Exists)
+            {
+                throw new FileNotFoundException(fi.FullName);
+            }
+
+            using (var stream = File.OpenRead(fi.FullName))
+            {
+                var key = PgpPublicKeyMetaData.GetPublicKeysHeirarchical(stream);
+                Console.WriteLine(JsonConvert.SerializeObject(key, Formatting.Indented));
+            }
+        }
+
+
         [TestMethod]
         public void TestBytesAndStreams()
         {
@@ -66,7 +104,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             {
                 PgpEncryptor.DecryptPgpData(fiOut.FullName, fiDecrypted.FullName, privateKeyStream, privateKeyPassPhrase, true);
             }
-       
+
         }
     }
 }

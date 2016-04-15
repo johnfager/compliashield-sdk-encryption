@@ -86,6 +86,9 @@
     <None Include="cert\DO_NOT_TRUST Testing_asBytes.cer">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="cert\FA283393.asc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="testfiles\dataFeb-8-2016_40M-pipe.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
