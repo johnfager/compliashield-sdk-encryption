@@ -2,6 +2,7 @@
 namespace CompliaShield.Sdk.Cryptography.Tests
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -44,8 +45,32 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             using (var stream = File.OpenRead(fi.FullName))
             {
                 var key = PgpPublicKeyMetaData.GetPublicKeysHeirarchical(stream);
+                IEnumerable<string> errors;
+                var isValid = key.Validate(out errors);
+                Assert.IsTrue(isValid);
                 Console.WriteLine(JsonConvert.SerializeObject(key, Formatting.Indented));
             }
+
+            //fi = new FileInfo(@"cert\FA283393-private.asc");
+            //if (!fi.Exists)
+            //{
+            //    throw new FileNotFoundException(fi.FullName);
+            //}
+
+            //using (var stream = File.OpenRead(fi.FullName))
+            //{
+            //    Exception exception = null;
+            //    try
+            //    {
+            //        var key = PgpPublicKeyMetaData.GetPublicKeysHeirarchical(stream);
+            //        Console.WriteLine(JsonConvert.SerializeObject(key, Formatting.Indented));
+            //    }
+            //    catch(System.Security.SecurityException ex)
+            //    {
+            //        exception = ex;
+            //    }
+            //    Assert.IsNotNull(exception);
+            //}
         }
 
 
