@@ -68,6 +68,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="cert\D916608D.asc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="cert\DO_NOT_TRUST Testing.cer">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

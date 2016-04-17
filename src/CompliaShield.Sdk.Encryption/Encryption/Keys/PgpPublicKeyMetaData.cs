@@ -36,27 +36,27 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 
         public int? ValidDays { get; set; }
 
-        private DateTime _expires;
+        //private DateTime _expires;
 
-        public DateTime Expires
-        {
-            get
-            {
-                // option for being set manually if the others are not
-                if (this.CreatedOnUtc.HasValue && this.ValidDays.HasValue)
-                {
-                    return this.CreatedOnUtc.Value.AddDays(this.ValidDays.Value);
-                }
-                else
-                {
-                    return _expires;
-                }
-            }
-            set
-            {
-                _expires = value;
-            }
-        }
+        public DateTime Expires { get; set; }
+        //{
+        //    get
+        //    {
+        //        // option for being set manually if the others are not
+        //        if (this.CreatedOnUtc.HasValue && this.ValidDays.HasValue)
+        //        {
+        //            return this.CreatedOnUtc.Value.AddDays(this.ValidDays.Value);
+        //        }
+        //        else
+        //        {
+        //            return _expires.GetValueOrDefault();
+        //        }
+        //    }
+        //    set
+        //    {
+        //        _expires = value;
+        //    }
+        //}
 
         public virtual IEnumerable<PgpPublicKeyMetaData> SubKeys { get; set; }
 
@@ -74,6 +74,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             this.Version = key.Version;
             this.CreatedOnUtc = key.CreationTime.ToUniversalTime();
             this.ValidDays = key.ValidDays;
+            this.Expires = this.CreatedOnUtc.Value.AddDays(this.ValidDays.Value); 
 
             try
             {
@@ -127,7 +128,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
                     errList.Add("No encryption keys are present.");
                 }
                 // get the encryption key
-                var encryptionKey = this.SubKeys.FirstOrDefault(x => x.IsEncryptionKey && x.Expires < DateTime.Now);
+                var encryptionKey = this.SubKeys.FirstOrDefault(x => x.IsEncryptionKey && x.Expires > DateTime.Now);
                 if (encryptionKey == null)
                 {
                     errList.Add("No encryption keys are present.");
@@ -199,7 +200,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
         {
             var keys = GetPublicKeys(inputStream).ToList();
             var master = keys.FirstOrDefault(x => x.IsMasterKey);
-            var subKeys = keys.Where(x => !x.IsMasterKey);
+            var subKeys = keys.Where(x => !x.IsMasterKey).ToList();
             master.SubKeys = subKeys;
             return master;
         }
@@ -225,6 +226,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             //    }
             //}
 
+            var list = new List<PgpPublicKeyMetaData>();
 
             PgpPublicKeyRingBundle pgpPub = new PgpPublicKeyRingBundle(inputStream);
 
@@ -234,9 +236,10 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
                 {
                     var keyMeta = new PgpPublicKeyMetaData();
                     keyMeta.Load(key);
-                    yield return keyMeta;
+                    list.Add(keyMeta);
                 }
             }
+            return list;
         }
 
     }

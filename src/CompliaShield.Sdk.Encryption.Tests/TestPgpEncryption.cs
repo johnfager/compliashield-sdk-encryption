@@ -18,7 +18,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         [TestMethod]
         public void TestLoadKeyMetaData()
         {
-            var fi = new FileInfo(@"cert\FA283393.asc");
+            var fi = new FileInfo(@"cert\D916608D.asc");
             if (!fi.Exists)
             {
                 throw new FileNotFoundException(fi.FullName);
@@ -36,7 +36,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         [TestMethod]
         public void TestLoadKeyMetaDataHeirarchical()
         {
-            var fi = new FileInfo(@"cert\FA283393.asc");
+            var fi = new FileInfo(@"cert\D916608D.asc");
             if (!fi.Exists)
             {
                 throw new FileNotFoundException(fi.FullName);
