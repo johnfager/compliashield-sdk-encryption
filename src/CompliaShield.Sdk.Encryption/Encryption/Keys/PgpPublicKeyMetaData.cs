@@ -34,11 +34,11 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 
         public DateTime? CreatedOnUtc { get; set; }
 
-        public int? ValidDays { get; set; }
+        //public int? ValidDays { get; set; }
 
         //private DateTime _expires;
 
-        public DateTime Expires { get; set; }
+        public DateTime? Expires { get; set; }
         //{
         //    get
         //    {
@@ -73,8 +73,22 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             this.IsEncryptionKey = key.IsEncryptionKey;
             this.Version = key.Version;
             this.CreatedOnUtc = key.CreationTime.ToUniversalTime();
-            this.ValidDays = key.ValidDays;
-            this.Expires = this.CreatedOnUtc.Value.AddDays(this.ValidDays.Value); 
+
+            var validForSeconds = key.GetValidSeconds();
+            if(validForSeconds > 0)
+            {
+                this.Expires = this.CreatedOnUtc.Value.AddSeconds(validForSeconds);
+            }
+
+            //this.ValidDays = key.ValidDays;
+            //if (this.ValidDays.HasValue)
+            //{
+            //    this.Expires = this.CreatedOnUtc.Value.AddDays(this.ValidDays.Value);
+            //}
+            //else
+            //{
+            //    this.Expires = null;
+            //}
 
             try
             {
@@ -115,9 +129,9 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
         {
             var errList = new List<string>();
 
-            if (this.Expires <= DateTime.UtcNow)
+            if (this.Expires.HasValue && this.Expires.Value <= DateTime.UtcNow)
             {
-                errList.Add("Certificate was expired.");
+                errList.Add("Certificate expired.");
             }
 
             // ensure at least 1 encryption key
@@ -128,10 +142,10 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
                     errList.Add("No encryption keys are present.");
                 }
                 // get the encryption key
-                var encryptionKey = this.SubKeys.FirstOrDefault(x => x.IsEncryptionKey && x.Expires > DateTime.Now);
+                var encryptionKey = this.SubKeys.FirstOrDefault(x => x.IsEncryptionKey && (!x.Expires.HasValue || x.Expires.Value > DateTime.Now));
                 if (encryptionKey == null)
                 {
-                    errList.Add("No encryption keys are present.");
+                    errList.Add("No valid encryption keys are present.");
                 }
             }
 
