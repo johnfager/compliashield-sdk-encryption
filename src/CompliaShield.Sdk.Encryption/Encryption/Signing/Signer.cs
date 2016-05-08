@@ -54,7 +54,23 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
 
         public string SignMd5Hash(byte[] hashedBytes)
         {
-            var signedHash = _privateKey.SignHash(hashedBytes, CryptoConfig.MapNameToOID("MD5"));
+            byte[] signedHash = null;
+            try
+            {
+                signedHash = _privateKey.SignHash(hashedBytes, CryptoConfig.MapNameToOID("MD5"));
+            }
+            catch(CryptographicException ex)
+            {
+                if(ex.Message == "Bad Hash.")
+                {
+                    var cryptoEx = new CryptographicException("Bad Hash; Use BasicHasher.GetMd5HashBytes() to generate a proper hash before calling this method.");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
             if (_encoding == EncodingOption.Base64String)
             {
                 return Convert.ToBase64String(signedHash);
@@ -71,7 +87,8 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
 
         public Tuple<byte[], string> SignMd5(byte[] hashedBytes)
         {
-            var signedHash = _privateKey.SignHash(hashedBytes, CryptoConfig.MapNameToOID("MD5"));
+            var cryptoconfig = CryptoConfig.MapNameToOID("MD5");
+            var signedHash = _privateKey.SignHash(hashedBytes, cryptoconfig);
             if (_encoding == EncodingOption.Base64String)
             {
                 return new Tuple<byte[], string>(signedHash, Convert.ToBase64String(signedHash));

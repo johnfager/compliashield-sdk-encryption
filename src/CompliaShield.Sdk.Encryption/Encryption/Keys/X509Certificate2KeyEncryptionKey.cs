@@ -1,6 +1,8 @@
 
 namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 {
+    using Extensions;
+    using Hashing;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -26,7 +28,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
         {
             get
             {
-                if(_x5092 == null)
+                if (_x5092 == null)
                 {
                     // max value means it should not be used
                     return DateTime.MaxValue;
@@ -34,7 +36,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
                 return _x5092.NotBefore;
             }
         }
-        
+
         public DateTime NotAfter
         {
             get
@@ -100,24 +102,40 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             return await this.SignAsync(digest, algorithm, new CancellationToken());
         }
 
+        /// <summary>
+        /// Signs a byte array by creating an appropriate hash.
+        /// </summary>
+        /// <param name="digest">Any data to sign.</param>
+        /// <param name="algorithm">MD5 or SHA1</param>
+        /// <param name="token"></param>
+        /// <returns>The signature for the digest as a byte array and string based hash code.</returns>
         public async Task<Tuple<byte[], string>> SignAsync(byte[] digest, string algorithm, CancellationToken token)
         {
             this.EnsureNotDisposed();
 
+            if (digest == null || !digest.Any())
+            {
+                throw new ArgumentException("digest");
+            }
             if (algorithm == null)
             {
                 throw new ArgumentNullException("algorithm");
             }
 
-            var signer = new Signing.Signer(this.GetRSACryptoServiceProvider());
+            var crypto = this.GetRSACryptoServiceProvider();
+            var signer = new Signing.Signer(crypto);
+
+
 
             algorithm = algorithm.ToLower();
             switch (algorithm)
             {
                 case "md5":
-                    return await Task.FromResult(signer.SignMd5(digest));
+                    var hashMd5 = BasicHasher.GetMd5HashBytes(digest);
+                    return await Task.FromResult(signer.SignMd5(hashMd5));
                 case "sha1":
-                    return await Task.FromResult(signer.SignSha1(digest));
+                    var hashSha1 = BasicHasher.GetSha1HashBytes(digest);
+                    return await Task.FromResult(signer.SignSha1(hashSha1));
                 default:
                     throw new NotImplementedException(string.Format("algorithm '{0}' is not implemented.", algorithm));
             }
@@ -150,10 +168,21 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             return await this.VerifyAsync(digest, signature, algorithm, new CancellationToken());
         }
 
+        /// <summary>
+        /// Verifies the byte array against a signature.
+        /// </summary>
+        /// <param name="digest"></param>
+        /// <param name="signature"></param>
+        /// <param name="algorithm"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<bool> VerifyAsync(byte[] digest, byte[] signature, string algorithm, CancellationToken token)
         {
             this.EnsureNotDisposed();
-
+            if (digest == null || !digest.Any())
+            {
+                throw new ArgumentException("digest");
+            }
             if (algorithm == null)
             {
                 throw new ArgumentNullException("algorithm");
@@ -165,9 +194,44 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             switch (algorithm)
             {
                 case "md5":
-                    return await Task.FromResult(verifier.VerifyMd5Hash(digest, signature));
+                    var hashMd5 = BasicHasher.GetMd5HashBytes(digest);
+                    return await Task.FromResult(verifier.VerifyMd5Hash(hashMd5, signature));
                 case "sha1":
-                    return await Task.FromResult(verifier.VerifySha1Hash(digest, signature));
+                    var hashSha1 = BasicHasher.GetSha1HashBytes(digest);
+                    return await Task.FromResult(verifier.VerifySha1Hash(hashSha1, signature));
+                default:
+                    throw new NotImplementedException(string.Format("algorithm '{0}' is not implemented.", algorithm));
+            }
+        }
+
+        public async Task<bool> VerifyAsync(byte[] digest, string signature, string algorithm)
+        {
+            return await this.VerifyAsync(digest, signature, algorithm, new CancellationToken());
+        }
+
+        public async Task<bool> VerifyAsync(byte[] digest, string signature, string algorithm, CancellationToken token)
+        {
+            this.EnsureNotDisposed();
+            if (digest == null || !digest.Any())
+            {
+                throw new ArgumentException("digest");
+            }
+            if (algorithm == null)
+            {
+                throw new ArgumentNullException("algorithm");
+            }
+
+            var verifier = new Signing.Verifier(this.GetRSACryptoServiceProvider());
+
+            algorithm = algorithm.ToLower();
+            switch (algorithm)
+            {
+                case "md5":
+                    var hashMd5 = BasicHasher.GetMd5Hash(digest);
+                    return await Task.FromResult(verifier.VerifyMd5Hash(hashMd5, signature));
+                case "sha1":
+                    var hashSha1 = BasicHasher.GetSha1Hash(digest);
+                    return await Task.FromResult(verifier.VerifySha1Hash(hashSha1, signature));
                 default:
                     throw new NotImplementedException(string.Format("algorithm '{0}' is not implemented.", algorithm));
             }

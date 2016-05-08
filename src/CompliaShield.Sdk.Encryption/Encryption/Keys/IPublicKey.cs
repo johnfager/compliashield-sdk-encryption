@@ -19,6 +19,10 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
         Task<bool> VerifyAsync(byte[] digest, byte[] signature, string algorithm);
 
         Task<bool> VerifyAsync(byte[] digest, byte[] signature, string algorithm, CancellationToken token);
+        
+        Task<bool> VerifyAsync(byte[] digest, string signature, string algorithm);
+
+        Task<bool> VerifyAsync(byte[] digest, string signature, string algorithm, CancellationToken token);
 
         string PublicKeyToPEM();
 
