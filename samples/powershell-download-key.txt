@@ -1,0 +1,30 @@
+# ----------------------------------------
+# ----- BEGIN VARIABLES -----
+# ----------------------------------------
+
+$identityKey = "7999ce4e-6d14-4979-853d-75359e28fef6"
+
+#Run the download
+$keysource = "https://datastore.compliashield.com/pgpkey/" + $identityKey + ".asc"
+
+# Define the file name for the saved PGP public key
+$keyfilepath = "C:\temp\pgp\" + $identityKey + ".asc"
+
+# Define the file to encrypt
+$unencryptedFilePath = "C:\temp\pgp\plain-text.txt"
+
+# ----------------------------------------
+# ----- END VARIABLES -----
+# ----------------------------------------
+
+$keyuserid = "CompliaShield Data Exchange <dataexchage@compliashield.com>"
+
+# Define the output file name
+$encryptedFilePath = $unencryptedFilePath + ".gpg"
+# 
+# Import the new key
+Invoke-WebRequest $keysource -OutFile $keyfilepath
+gpg --batch --yes --import $keyfilepath
+# 
+# Encrypt the file
+gpg  --batch --yes --trust-model always --recipient $keyuserid --output $encryptedFilePath --encrypt $unencryptedFilePath

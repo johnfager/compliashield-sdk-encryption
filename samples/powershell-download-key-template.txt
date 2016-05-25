@@ -1,0 +1,28 @@
+# ----------------------------------------
+# ----- BEGIN VARIABLES -----
+# ----------------------------------------
+
+#Run the download
+$keysource = "{{YOUR_KEY_URL_HERE}}"
+
+# Define the file name for the saved PGP public key
+$keyfilepath = "{{PATH_TO_LOCAL_DOWNLOADED_FILE}}"
+
+# Define the file to encrypt
+$unencryptedFilePath = "{{PATH_TO_UNENCRYPTED_FILE}}"
+
+# Define the output file name
+$encryptedFilePath = "{{PATH_TO_ENCRYPTED_FILE}}" #SHOULD END WITH .gpg
+
+$keyuserid = "CompliaShield Data Exchange <dataexchage@compliashield.com>"
+
+# ----------------------------------------
+# ----- END VARIABLES -----
+# ----------------------------------------
+
+# Import the new key
+Invoke-WebRequest $keysource -OutFile $keyfilepath
+gpg --batch --yes --import $keyfilepath
+
+# Encrypt the file
+gpg  --batch --yes --trust-model always --recipient $keyuserid --output $encryptedFilePath --encrypt $unencryptedFilePath
