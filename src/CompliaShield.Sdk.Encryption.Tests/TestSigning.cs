@@ -11,6 +11,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
     using System.Management;
     using System.Reflection;
     using System.Security.Cryptography;
+    using CompliaShield.Sdk.Cryptography.Extensions;
     using Utilities;
     using Encryption;
     using Encryption.Keys;
@@ -19,6 +20,17 @@ namespace CompliaShield.Sdk.Cryptography.Tests
     [TestClass]
     public class TestSigning : _baseTest
     {
+
+        [TestMethod]
+        public void TestLength()
+        {
+            var hex = "f87104a9953455f7a75133208c65f0e1";
+
+            Assert.IsFalse(hex == null || !(hex.Length == 32 | hex.Length == 40));
+
+        }
+
+
         [TestMethod]
         public void TestMethod1()
         {
@@ -26,9 +38,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             var key = new X509Certificate2KeyEncryptionKey(cert2);
             var guid = new Guid();
             var bytesToMd5Hash = Serializer.SerializeToByteArray(guid);
-            //var md5Hash = BasicHasher.GetMd5HashBytes(bytesToMd5Hash); //ChecksumHash.GetMD5Hash(bytesToMd5Hash);
-
-
+            
             var res = key.SignAsync(bytesToMd5Hash, "MD5").GetAwaiter().GetResult();
             Assert.IsNotNull(res.Item1);
             Assert.IsNotNull(res.Item2);
@@ -38,6 +48,14 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
             var isValid2 = key.VerifyAsync(bytesToMd5Hash, res.Item2, "MD5").GetAwaiter().GetResult();
             Assert.IsTrue(isValid2);
+
+            var md5HashHex = BasicHasher.GetMd5Hash(bytesToMd5Hash); //ChecksumHash.GetMD5Hash(bytesToMd5Hash);
+            var isValidHex = key.VerifyAsync(md5HashHex, res.Item2).GetAwaiter().GetResult();
+            Assert.IsTrue(isValidHex);
+
+            var signedHex = key.SignAsync(md5HashHex).GetAwaiter().GetResult();
+            isValidHex = key.VerifyAsync(md5HashHex, signedHex.Item2).GetAwaiter().GetResult();
+            Assert.IsTrue(isValidHex);
 
             // sha1
 
@@ -50,6 +68,14 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
             isValid2 = key.VerifyAsync(bytesToMd5Hash, res.Item2, "SHA1").GetAwaiter().GetResult();
             Assert.IsTrue(isValid2);
+
+            var sha1HashHex = BasicHasher.GetSha1Hash(bytesToMd5Hash);
+            isValidHex = key.VerifyAsync(sha1HashHex, res.Item2).GetAwaiter().GetResult();
+            Assert.IsTrue(isValidHex);
+
+            var sha1HexSigned = key.SignAsync(sha1HashHex).GetAwaiter().GetResult();
+            isValidHex = key.VerifyAsync(sha1HashHex, sha1HexSigned.Item2).GetAwaiter().GetResult();
+            Assert.IsTrue(isValidHex);
 
         }
     }

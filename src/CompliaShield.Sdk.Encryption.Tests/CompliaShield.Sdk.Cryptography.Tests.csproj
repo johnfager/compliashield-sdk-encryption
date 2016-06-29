@@ -117,6 +117,9 @@
     <Content Include="cert\DO_NOT_TRUST Testing_thumbprint.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="testfiles\test-encryption-file.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CompliaShield.Sdk.Encryption\CompliaShield.Sdk.Cryptography.csproj">

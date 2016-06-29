@@ -32,7 +32,44 @@ namespace CompliaShield.Sdk.Cryptography.Tests
                 }
             }
         }
-        
+
+        [TestMethod]
+        public void TestLoadKeyMetaDataCmre()
+        {
+            var fi = new FileInfo(@"\\vmware-host\Shared Folders\FileStore\JFM Concepts\Clients\RevSource\Data\CMRE Data\cmre.asc");
+            if (!fi.Exists)
+            {
+                throw new FileNotFoundException(fi.FullName);
+            }
+
+            using (var stream = File.OpenRead(fi.FullName))
+            {
+                foreach (var key in PgpPublicKeyMetaData.GetPublicKeys(stream))
+                {
+                    Console.WriteLine(JsonConvert.SerializeObject(key, Formatting.Indented));
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestBytesAndStreamsCmre()
+        {
+            var fi = new FileInfo(@"testfiles\test-encryption-file.txt");
+            var fiOut = new FileInfo(fi.FullName + ".gpg");
+
+            var fiPublicKey = new FileInfo(@"\\vmware-host\Shared Folders\FileStore\JFM Concepts\Clients\RevSource\Data\CMRE Data\cmre.asc");
+
+            // encrypt
+            using (Stream publicKeyStream = File.OpenRead(fiPublicKey.FullName))
+            {
+                var bytes = File.ReadAllBytes(fi.FullName);
+                var output = PgpEncryptor.EncryptAes256(bytes, fi.Name, publicKeyStream, withIntegrityCheck: true, armor: false, compress: true);
+                File.WriteAllBytes(fiOut.FullName, output.ToArray());
+            }            
+        }
+
+        // -------------
+
         [TestMethod]
         public void TestLoadKeyMetaDataHeirarchical()
         {

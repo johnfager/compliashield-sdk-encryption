@@ -13,7 +13,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
     using System.Threading.Tasks;
     using Utilities;
 
-    public sealed class X509Certificate2KeyEncryptionKey : IKeyEncyrptionKey
+    public partial class X509CertificatePublicKey : IPublicKey
     {
 
         private X509Certificate2 _x5092;
@@ -63,7 +63,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 
         #region .ctors
 
-        public X509Certificate2KeyEncryptionKey(X509Certificate2 x509Certificate2)
+        public X509CertificatePublicKey(X509Certificate2 x509Certificate2)
         {
             if (x509Certificate2 == null)
             {
@@ -73,126 +73,14 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             {
                 this.KeyId = x509Certificate2.Thumbprint.ToLower();
             }
-            if (!x509Certificate2.HasPrivateKey)
+            if (x509Certificate2.PublicKey == null)
             {
-                throw new ArgumentException(string.Format("x509Certificate2 with thumbprint '{0}' does not have a private key.", x509Certificate2.Thumbprint));
-            }
-            var badPrivateKeyEx = new ArgumentException(string.Format("x509Certificate2 with thumbprint '{0}' does not have a private key.", x509Certificate2.Thumbprint));
-
-            try
-            {
-                if (x509Certificate2.PrivateKey == null)
-                {
-                    throw badPrivateKeyEx;
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex == badPrivateKeyEx)
-                {
-                    throw;
-                }
-                throw new ArgumentException(badPrivateKeyEx.Message, ex);
+                throw new ArgumentException("x509Certificate2.PublicKey");
             }
             _x5092 = x509Certificate2;
         }
 
         #endregion
-
-        public async Task<Tuple<byte[], string>> SignAsync(byte[] digest, string algorithm)
-        {
-            return await this.SignAsync(digest, algorithm, new CancellationToken());
-        }
-
-        /// <summary>
-        /// Signs a byte array by creating an appropriate hash.
-        /// </summary>
-        /// <param name="digest">Any data to sign.</param>
-        /// <param name="algorithm">MD5 or SHA1</param>
-        /// <param name="token"></param>
-        /// <returns>The signature for the digest as a byte array and string based hash code.</returns>
-        public async Task<Tuple<byte[], string>> SignAsync(byte[] digest, string algorithm, CancellationToken token)
-        {
-            this.EnsureNotDisposed();
-
-            if (digest == null || !digest.Any())
-            {
-                throw new ArgumentException("digest");
-            }
-            if (algorithm == null)
-            {
-                throw new ArgumentNullException("algorithm");
-            }
-
-            var crypto = this.GetRSACryptoServiceProvider();
-            var signer = new Signing.Signer(crypto);
-
-            algorithm = algorithm.ToLower();
-            switch (algorithm)
-            {
-                case "md5":
-                    var hashMd5 = BasicHasher.GetMd5HashBytes(digest);
-                    return await Task.FromResult(signer.SignMd5(hashMd5));
-                case "sha1":
-                    var hashSha1 = BasicHasher.GetSha1HashBytes(digest);
-                    return await Task.FromResult(signer.SignSha1(hashSha1));
-                default:
-                    throw new NotImplementedException(string.Format("algorithm '{0}' is not implemented.", algorithm));
-            }
-        }
-
-        public async Task<Tuple<byte[], string>> SignAsync(string hex)
-        {
-            this.EnsureNotDisposed();
-
-            if (hex == null || !(hex.Length == 32 | hex.Length == 40))
-            {
-                throw new ArgumentException("hex must be a valid MD5 or SHA1 hash in HEX format");
-            }
-            string algorithm = "md5";
-            if (hex.Length == 40)
-            {
-                algorithm = "sha1";
-            }
-
-            var crypto = this.GetRSACryptoServiceProvider();
-            var signer = new Signing.Signer(crypto);
-
-            algorithm = algorithm.ToLower();
-            var hashBytes = hex.HexStringToByteArray();
-
-            switch (algorithm)
-            {
-                case "md5":
-                    return await Task.FromResult(signer.SignMd5(hashBytes));
-                case "sha1":
-                    return await Task.FromResult(signer.SignSha1(hashBytes));
-                default:
-                    throw new NotImplementedException(string.Format("algorithm '{0}' is not implemented.", algorithm));
-            }
-        }
-
-        public async Task<byte[]> UnwrapKeyAsync(byte[] encryptedKey)
-        {
-            return await this.UnwrapKeyAsync(encryptedKey, new CancellationToken());
-        }
-
-        public async Task<byte[]> UnwrapKeyAsync(byte[] encryptedKey, CancellationToken token)
-        {
-            this.EnsureNotDisposed();
-
-            var alg = this.GetRSACryptoServiceProvider();
-            byte[] keyOut;
-            try
-            {
-                keyOut = alg.Decrypt(encryptedKey, false);
-            }
-            catch (Exception ex)
-            {
-                throw new CryptographicException(string.Format("X509Certificate2 with thumbprint '{0}' throw an exception on Decrypt. See inner exception for details", _x5092.Thumbprint), ex);
-            }
-            return await Task.FromResult(keyOut);
-        }
 
         public async Task<bool> VerifyAsync(byte[] digest, byte[] signature, string algorithm)
         {
@@ -328,25 +216,15 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             if (_x5092.PublicKey != null)
             {
                 alg = _x5092.PublicKey.Key as RSACryptoServiceProvider;
-            }            
+            }
             if (alg == null)
             {
                 throw new NotImplementedException(string.Format("X509Certificate2 with thumbprint '{0}' PublicKey.Key is not a valid RSACryptoServiceProvider.", _x5092.Thumbprint));
             }
             return alg;
         }
-
-
-        private RSACryptoServiceProvider GetRSACryptoServiceProvider()
-        {
-            var alg = _x5092.PrivateKey as RSACryptoServiceProvider;
-            if (alg == null)
-            {
-                throw new NotImplementedException(string.Format("X509Certificate2 with thumbprint '{0}' PrivateKey is not a valid RSACryptoServiceProvider. PrivateKey is of type '{1}'.", _x5092.Thumbprint, _x5092.PrivateKey.GetType().FullName));
-            }
-            return alg;
-        }
-
+        
         #endregion
+
     }
 }

@@ -21,6 +21,8 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 
         Task<Tuple<byte[], string>> SignAsync(byte[] digest, string algorithm);
 
+        Task<Tuple<byte[], string>> SignAsync(string hex);
+
         Task<Tuple<byte[], string>> SignAsync(byte[] digest, string algorithm, CancellationToken token);
 
     }

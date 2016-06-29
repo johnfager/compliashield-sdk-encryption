@@ -23,6 +23,11 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
             return new X509Certificate2KeyEncryptionKey(x509Certificate2);
         }
 
+        public static IPublicKey GetPublicKey(X509Certificate2 x509Certificate2)
+        {
+            return new X509CertificatePublicKey(x509Certificate2);
+        }
+
         public static RSACryptoServiceProvider GetRSACryptoServiceProviderFromPrivateKey(X509Certificate2 x509Certificate2)
         {
             if (x509Certificate2 == null)

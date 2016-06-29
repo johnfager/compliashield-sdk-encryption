@@ -8,6 +8,8 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 
     public interface IPublicKey : IDisposable
     {
+        string Actor { get; set; }
+
         string KeyId { get; }
 
         DateTime NotBefore { get; }
@@ -23,6 +25,10 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
         Task<bool> VerifyAsync(byte[] digest, string signature, string algorithm);
 
         Task<bool> VerifyAsync(byte[] digest, string signature, string algorithm, CancellationToken token);
+
+        Task<bool> VerifyAsync(string hex, string signature);
+
+        Task<bool> VerifyAsync(string hex, string signature, CancellationToken token);
 
         string PublicKeyToPEM();
 

@@ -32,6 +32,8 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 
         public virtual string IdentityEmail { get; set; }
 
+        public virtual bool? IsVerified { get; set; }
+
         public DateTime? CreatedOnUtc { get; set; }
 
         //public int? ValidDays { get; set; }
