@@ -296,6 +296,10 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             {
                 throw new NotImplementedException(string.Format("AsymmetricStrategyOption '{0}' not implemented.", this.AsymmetricStrategy.ToString()));
             }
+
+            passPhraseAsBytes.ClearByteArray();
+            passPhrase2AsBytes.ClearByteArray();
+
             return asymEncObj;
         }
 
@@ -342,6 +346,8 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
                     // generate the full passphrase
                     passphraseAsBytes = passPhrase1Bytes.Concat(passPhrase2Bytes).ToArray();
                 }
+                passPhrase1Bytes.ClearByteArray();
+                passPhrase2Bytes.ClearByteArray();
             }
 
             object output = null;
@@ -369,6 +375,9 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             {
                 throw new NotImplementedException(string.Format("AsymmetricStrategyOption '{0}' not implemented.", input.AsymmetricStrategy.ToString()));
             }
+
+            passphraseAsBytes.ClearByteArray();
+
             return output;
         }
 

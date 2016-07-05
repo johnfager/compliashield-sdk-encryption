@@ -48,8 +48,8 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
                     var unprotectedPwdStr = AsymmetricEncryptor.DecryptFromBase64String(protectedPwStr, privateKey);
 
-                    var decryptedUnprotectedPw = AesEncryptor.Decrypt(encryptedBase64, unprotectedPwdStr);
-                    Assert.AreEqual(stringToEncrypt, decryptedUnprotectedPw);
+                    var decryptedString = AesEncryptor.Decrypt(encryptedBase64, unprotectedPwdStr);
+                    Assert.AreEqual(stringToEncrypt, decryptedString);
 
                 }
             }

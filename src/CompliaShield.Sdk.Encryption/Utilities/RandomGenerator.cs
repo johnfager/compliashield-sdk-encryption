@@ -217,6 +217,7 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
         private SecureString GenerateRandomSecureStringFromAllowedValues(string allowedValues, int size)
         {
             var secureString = new SecureString();
+            
             int i = 0;
             int alllowLen = allowedValues.Length;
 
