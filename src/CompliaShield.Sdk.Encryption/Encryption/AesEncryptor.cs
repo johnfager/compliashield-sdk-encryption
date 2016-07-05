@@ -20,18 +20,22 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
         public static string Decrypt(string encryptedString, SecureString passPhrase)
         {
             var passwordBytes = passPhrase.ToByteArray();
-            return Decrypt(encryptedString, passwordBytes);
+            var output = Decrypt(encryptedString, passwordBytes);
+            passwordBytes.ClearByteArray();
+            return output;
         }
 
         public static string Decrypt(string encryptedString, byte[] passwordBytes)
         {
             return Decrypt_Private(encryptedString, passwordBytes, false);
         }
-        
+
         public static string Decrypt(string encryptedString, SecureString passPhrase, bool useBase36)
         {
             var passwordBytes = passPhrase.ToByteArray();
-            return Decrypt(encryptedString, passwordBytes, useBase36);
+            var output = Decrypt(encryptedString, passwordBytes, useBase36);
+            passwordBytes.ClearByteArray();
+            return output;
         }
 
         public static string Decrypt(string encryptedString, byte[] passwordBytes, bool useBase36)
@@ -43,7 +47,9 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
         public static byte[] Decrypt(byte[] encryptionPayload, SecureString passPhrase)
         {
             var passwordBytes = passPhrase.ToByteArray();
-            return Decrypt(encryptionPayload, passwordBytes);
+            var output = Decrypt(encryptionPayload, passwordBytes);
+            passwordBytes.ClearByteArray();
+            return output;
         }
 
         public static byte[] Decrypt(byte[] encryptionPayload, byte[] passwordBytes)
@@ -86,7 +92,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
         }
 
         #endregion
-        
+
         #region AES1000
 
         /// <summary>
@@ -132,8 +138,8 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             // in version 1, we use UTF8 for our plain text value to bytes
             byte[] unencryptedBytes = Encoding.UTF8.GetBytes(plainText);
             var passPhraseAsBytes = passPhrase.ToByteArray();
-
             var payload = Encrypt_Private_v1(unencryptedBytes, passPhraseAsBytes, iterations);
+            passPhraseAsBytes.ClearByteArray(); // modify the byte array
 
             string cipherText;
             if (useBase36)

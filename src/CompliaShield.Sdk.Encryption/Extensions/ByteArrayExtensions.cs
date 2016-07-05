@@ -43,6 +43,22 @@ namespace CompliaShield.Sdk.Cryptography.Extensions
             return secureString;
         }
 
+
+        public static void ClearByteArray(this byte[] helper)
+        {
+            if(helper == null || helper.Length == 0)
+            {
+                return;
+            }
+            // clear the byte array
+            for (int i = 0; i < helper.Length; i++)
+            {
+                helper[i] = (byte)0;
+            }
+            // set the byte array to null
+            helper = null;
+        }
+
         public static string ToHexString(this byte[] helper, bool lowerCase)
         {
             var hexCode = "x2";
