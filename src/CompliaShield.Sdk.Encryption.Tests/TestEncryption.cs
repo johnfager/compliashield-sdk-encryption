@@ -13,10 +13,73 @@ namespace CompliaShield.Sdk.Cryptography.Tests
     using System.Security.Cryptography;
     using Utilities;
     using Encryption;
+    using Encryption.SerializationHelpers;
+
 
     [TestClass]
     public class TestEncryption : _baseTest
     {
+
+
+        [TestMethod]
+        public void TestAsymmetricallyEncryptedBackupObject()
+        {
+            var cert2 = LoadCertificate();
+
+            var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
+            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
+
+            var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
+
+            var encryptor = new AsymmetricEncryptor() { AsymmetricStrategy = AsymmetricStrategyOption.Aes256_1000 };
+
+            var asymEncObj = encryptor.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToLower(), publicKey);
+            asymEncObj.PublicMetadata = new Dictionary<string, string>();
+            asymEncObj.PublicMetadata["keyA"] = "valueA";
+            asymEncObj.PublicMetadata["keyB"] = "valueB";
+
+
+            var asymEncObj2 = encryptor.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToLower(), publicKey);
+            asymEncObj.PublicMetadata = new Dictionary<string, string>();
+            asymEncObj.PublicMetadata["keyA-2"] = "valueA-2";
+            asymEncObj.PublicMetadata["keyB-2"] = "valueB-2";
+
+            var backup = new AsymmetricallyEncryptedBackupObject()
+            {
+                AssociationObjectIdentifier = Guid.NewGuid().ToString(),
+                AssociationObjectType = "test",
+                BackupObjects = new Dictionary<string, AsymmetricallyEncryptedObject>()
+            };
+
+            backup.BackupObjects["objA"] = asymEncObj;
+            backup.BackupObjects["objB"] = asymEncObj2;
+
+            var asymBackup = encryptor.EncryptObject(backup, cert2.Thumbprint, publicKey);
+            var decrypted = encryptor.DecryptObject(asymBackup, privateKey);
+
+            Assert.IsTrue(decrypted is AsymmetricallyEncryptedBackupObject);
+
+            var asBytes = asymBackup.ToByteArray();
+            var newAsymmObj = new AsymmetricallyEncryptedObject();
+            newAsymmObj.LoadFromByteArray(asBytes);
+            var decrypted2 = encryptor.DecryptObject(newAsymmObj, privateKey);
+            Assert.IsTrue(decrypted2 is AsymmetricallyEncryptedBackupObject);
+
+            // let's decrypt the embedded types
+
+            var backupObjFromBytes = decrypted2 as AsymmetricallyEncryptedBackupObject;
+            Assert.AreEqual(backupObjFromBytes.AssociationObjectIdentifier, backup.AssociationObjectIdentifier);
+            Assert.AreEqual(backupObjFromBytes.AssociationObjectType, backup.AssociationObjectType);
+
+            var objA = backupObjFromBytes.BackupObjects["objA"];
+            var decryptedObjA = encryptor.DecryptObject(objA, privateKey);
+            Assert.AreEqual(stringToEncrypt, decryptedObjA);
+
+            var objB = backupObjFromBytes.BackupObjects["objB"];
+            var decryptedObjB = encryptor.DecryptObject(objB, privateKey);
+            Assert.AreEqual(stringToEncrypt, decryptedObjB);
+
+        }
 
 
         [TestMethod]
@@ -50,7 +113,6 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
                     var decryptedString = AesEncryptor.Decrypt(encryptedBase64, unprotectedPwdStr);
                     Assert.AreEqual(stringToEncrypt, decryptedString);
-
                 }
             }
         }
@@ -95,7 +157,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
                 }
             }
         }
-        
+
         [TestMethod]
         public void TestAes1000()
         {
@@ -236,14 +298,34 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
             var encryptor = new AsymmetricEncryptor() { AsymmetricStrategy = AsymmetricStrategyOption.Aes256_1000 };
             var asymEncObj = encryptor.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToLower(), publicKey);
+
+            asymEncObj.PublicMetadata = new Dictionary<string, string>();
+            asymEncObj.PublicMetadata["keyA"] = "valueA";
+            asymEncObj.PublicMetadata["keyB"] = "valueB";
+
             asymEncObj.KeyId = cert2.Thumbprint.ToLower();
-            var asymEncObjBytes = Serializer.SerializeToByteArray(asymEncObj);
+            var asymEncObjDirectSerializedBytes = Serializer.SerializeToByteArray(asymEncObj);
 
             // deserialize
 
-            var asymEncObj2 = Serializer.DeserializeFromByteArray(asymEncObjBytes) as AsymmetricallyEncryptedObject;
+            var asymEncObj2 = Serializer.DeserializeFromByteArray(asymEncObjDirectSerializedBytes) as AsymmetricallyEncryptedObject;
             Assert.IsNotNull(asymEncObj);
             Assert.IsTrue(!string.IsNullOrEmpty(asymEncObj.KeyId));
+
+            var asymEncObjBytes2 = asymEncObj.ToByteArray();
+            var asymEncObj3 = new AsymmetricallyEncryptedObject();
+            asymEncObj3.LoadFromByteArray(asymEncObjBytes2);
+
+            var decrypted = encryptor.DecryptObject(asymEncObj3, privateKey) as string;
+            Assert.AreEqual(decrypted, stringToEncrypt);
+
+            // test deserializing with direct
+            var asymEncObj4 = new AsymmetricallyEncryptedObject();
+            asymEncObj4.LoadFromByteArray(asymEncObjDirectSerializedBytes);
+
+            var decrypted2 = encryptor.DecryptObject(asymEncObj4, privateKey) as string;
+            Assert.AreEqual(decrypted2, stringToEncrypt);
+
 
         }
 

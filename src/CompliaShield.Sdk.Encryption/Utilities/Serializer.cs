@@ -28,7 +28,8 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
 
             var settings = new JsonSerializerSettings()
             {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                NullValueHandling = NullValueHandling.Ignore
             };
             if (indented)
             {

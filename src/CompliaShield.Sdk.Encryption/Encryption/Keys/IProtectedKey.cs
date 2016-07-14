@@ -17,5 +17,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 
         Task<IKeyEncyrptionKey> ToKeyEncyrptionKeyAsync(IKeyEncyrptionKey keyProtector);
 
+        Task UpdateKeyProtectorAsync(IKeyEncyrptionKey currentKeyProtector, IPublicKey newKeyProtector);
+
     }
 }

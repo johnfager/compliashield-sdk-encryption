@@ -1,17 +1,20 @@
 
 namespace CompliaShield.Sdk.Cryptography.Encryption
 {
+
     using System;
     using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-
-    // NOTE: This class is sealed due to use of serialization and issues that can arise from missing members.
+    using SerializationHelpers;
 
     [Serializable]
     public abstract class AsymmetricEncryptionMetaDataBase
     {
+       
+        public abstract Dictionary<string, string> PublicMetadata { get; set; }
         
         public abstract string KeyId { get; set; }
 

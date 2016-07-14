@@ -67,9 +67,9 @@ namespace CompliaShield.Sdk.Cryptography.Tests
                     var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
                     list.Add(stringToEncrypt);
                     var asymEnc = new AsymmetricEncryptor(AsymmetricStrategyOption.Aes256_1000);
-                    var asymObj = asymEnc.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToString().ToLower(), publicKey);
+                    var asymObj = asymEnc.EncryptObjectAsync(stringToEncrypt, cert2.Thumbprint.ToString().ToLower(), privateKey).GetAwaiter().GetResult();
                     listEnc.Add(asymObj);
-                    var decrypted = asymEnc.DecryptObject(asymObj, privateKey);
+                    var decrypted = asymEnc.DecryptObjectAsync(asymObj, privateKey).GetAwaiter().GetResult();
                     Assert.AreEqual(stringToEncrypt, decrypted);
                 }
             }

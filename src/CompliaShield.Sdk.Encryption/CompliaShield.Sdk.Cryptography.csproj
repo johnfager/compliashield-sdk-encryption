@@ -52,11 +52,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Encryption\AsymmetricallyEncryptedBackupObject.cs" />
     <Compile Include="Encryption\Keys\PgpPublicKeyMetaData.cs" />
     <Compile Include="Encryption\Keys\ProtectedX509Certificate2.cs" />
     <Compile Include="Encryption\Keys\IProtectedKey.cs" />
     <Compile Include="Encryption\Keys\IPublicKey.cs" />
     <Compile Include="Encryption\Keys\X509CertificatePublicKey.cs" />
+    <Compile Include="Encryption\SerializationHelpers\DictionaryOfStringConverter.cs" />
+    <Compile Include="Encryption\SerializationHelpers\KeyValuePairOfString.cs" />
+    <Compile Include="Encryption\SerializationHelpers\StringDictionaryCaseInsensitive.cs" />
+    <Compile Include="Extensions\KeyExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Utilities\StringWriterWithEncoding.cs" />
     <Compile Include="X509Certificates\CertificatePolicy.cs" />

@@ -10,7 +10,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
-    
+
     using CompliaShield.Sdk.Cryptography.Encryption.Keys;
     using CompliaShield.Sdk.Cryptography.Extensions;
     using CompliaShield.Sdk.Cryptography.Utilities;
@@ -118,14 +118,31 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
 
         #endregion
 
+        //[Obsolete("Prefer the async implementation of IPublicKey")]
         public AsymmetricallyEncryptedObject EncryptObject(object input, string keyId, RSACryptoServiceProvider publicKey)
         {
             return this.EncryptObject_Private(input, keyId, publicKey, null, null);
         }
 
+        //[Obsolete("Prefer the async implementation of IPublicKey")]
         public AsymmetricallyEncryptedObject EncryptObject(object input, string key1Id, RSACryptoServiceProvider publicKey1, string key2Id, RSACryptoServiceProvider publicKey2)
         {
             return this.EncryptObject_Private(input, key1Id, publicKey1, key2Id, publicKey2);
+        }
+
+        public async Task<AsymmetricallyEncryptedObject> EncryptObjectAsync(object input, string keyId, IPublicKey publicKey)
+        {
+            // temporary... need to shift to create a password and wrap or unwrap in future
+            var rsa = publicKey.ToRSACryptoServiceProvider();
+            return await Task.FromResult(this.EncryptObject_Private(input, keyId, rsa, null, null));
+        }
+
+        public async Task<AsymmetricallyEncryptedObject> EncryptObjectAsync(object input, string key1Id, IPublicKey publicKey1, string key2Id, IPublicKey publicKey2)
+        {
+            // temporary... need to shift to create a password and wrap or unwrap in future
+            var rsa1 = publicKey1.ToRSACryptoServiceProvider();
+            var rsa2 = publicKey2.ToRSACryptoServiceProvider();
+            return await Task.FromResult(this.EncryptObject_Private(input, key1Id, rsa1, key2Id, rsa2));
         }
 
         public object DecryptObject(AsymmetricallyEncryptedObject input, IKeyEncyrptionKey privateKey)
