@@ -14,11 +14,75 @@ namespace CompliaShield.Sdk.Cryptography.Tests
     using Utilities;
     using Encryption;
     using Encryption.SerializationHelpers;
-
+    using Org.BouncyCastle.OpenSsl;
+    using Org.BouncyCastle.Crypto.Parameters;
+    using Org.BouncyCastle.Security;
+    public class RSAKey
+    {
+        public string PublicPEM { get; set; }
+        public string PrivatePEM { get; set; }
+        public string PublicSSH { get; set; }
+    }
 
     [TestClass]
     public class TestEncryption : _baseTest
     {
+        [TestMethod]
+        public void GetSSHPublicKey()
+        {
+
+            var cert2 = LoadCertificate();
+
+            var ssh = X509CertificateHelper.ExportToPublicSshKey(cert2);
+            Console.WriteLine(ssh);
+
+            //var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
+            //RSAParameters parameters = publicKey.ExportParameters(false);
+            //byte[] exponet = parameters.Exponent;
+            //byte[] modulus = parameters.Modulus;
+
+
+            //var byte1 = Encoding.ASCII.GetBytes("ssh-rsa");
+            //var output = exponet.Concat(modulus);  // byte1.Concat(exponet).Concat(modulus);
+
+            //var b64 = "ssh-rsa " + Convert.ToBase64String(output.ToArray());
+            ////Console.WriteLine(b64);
+
+            
+            //RsaKeyParameters r = DotNetUtilities.GetRsaPublicKey(parameters);
+            
+            //byte[] sshrsa_bytes = Encoding.Default.GetBytes("ssh-rsa");
+            //byte[] n = r.Modulus.ToByteArray();
+            //byte[] e = r.Exponent.ToByteArray();
+
+            //string buffer64;
+            //using (MemoryStream ms = new MemoryStream())
+            //{
+            //    ms.Write(ToBytes(sshrsa_bytes.Length), 0, 4);
+            //    ms.Write(sshrsa_bytes, 0, sshrsa_bytes.Length);
+            //    ms.Write(ToBytes(e.Length), 0, 4);
+            //    ms.Write(e, 0, e.Length);
+            //    ms.Write(ToBytes(n.Length), 0, 4);
+            //    ms.Write(n, 0, n.Length);
+            //    ms.Flush();
+            //    buffer64 = Convert.ToBase64String(ms.ToArray());
+            //}
+
+            //var publicSsh = string.Format("ssh-rsa {0}", buffer64);
+            //Console.WriteLine(publicSsh);
+
+
+        }
+
+        private static byte[] ToBytes(int i)
+        {
+            byte[] bts = BitConverter.GetBytes(i);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bts);
+            }
+            return bts;
+        }
 
 
         [TestMethod]

@@ -164,5 +164,87 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
             output = output.Replace(Environment.NewLine, "\n");
             return output;
         }
+
+        public static string ExportToPublicSshKey(X509Certificate2 cert)
+        {
+            if (cert == null)
+            {
+                throw new ArgumentException(nameof(cert));
+            }
+            try
+            {
+                return ExportToSshKey(GetRSACryptoServiceProviderFromPublicKey(cert), false);
+            }
+            catch (Exception ex)
+            {
+                var outer = new CryptoException(string.Format("Could not ExportToPrivateSshKey; Tumbprint '{0}'. See inner exception for details.", cert.Thumbprint), ex);
+                throw outer;
+            }
+        }
+
+
+        public static string ExportToPrivateSshKey(X509Certificate2 cert)
+        {
+            if (cert == null)
+            {
+                throw new ArgumentException(nameof(cert));
+            }
+            if (!cert.HasPrivateKey)
+            {
+                throw new CryptoException(string.Format("Could not ExportToPrivateSshKey; Tumbprint '{0}' does not have a private key. See inner exception for details.", cert.Thumbprint));
+            }
+            try
+            {
+                return ExportToSshKey(GetRSACryptoServiceProviderFromPrivateKey(cert), true);
+            }
+            catch (Exception ex)
+            {
+                var outer = new CryptoException(string.Format("Could not ExportToPrivateSshKey; Tumbprint '{0}'. See inner exception for details.", cert.Thumbprint), ex);
+                throw outer;
+            }
+        }
+
+        public static string ExportToSshKey(RSACryptoServiceProvider crytpo, bool includePrivateParameters)
+        {
+            if (crytpo == null)
+            {
+                throw new ArgumentNullException("crypto");
+            }
+
+            RSAParameters parameters = crytpo.ExportParameters(false);
+
+            RsaKeyParameters r = DotNetUtilities.GetRsaPublicKey(parameters);
+
+            byte[] sshrsa_bytes = Encoding.Default.GetBytes("ssh-rsa");
+            byte[] n = r.Modulus.ToByteArray();
+            byte[] e = r.Exponent.ToByteArray();
+
+            string buffer64;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                ms.Write(ToBytes(sshrsa_bytes.Length), 0, 4);
+                ms.Write(sshrsa_bytes, 0, sshrsa_bytes.Length);
+                ms.Write(ToBytes(e.Length), 0, 4);
+                ms.Write(e, 0, e.Length);
+                ms.Write(ToBytes(n.Length), 0, 4);
+                ms.Write(n, 0, n.Length);
+                ms.Flush();
+                buffer64 = Convert.ToBase64String(ms.ToArray());
+            }
+
+            var publicSsh = string.Format("ssh-rsa {0}", buffer64);
+            return publicSsh;
+        }
+
+        private static byte[] ToBytes(int i)
+        {
+            byte[] bts = BitConverter.GetBytes(i);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bts);
+            }
+            return bts;
+        }
+
     }
 }
