@@ -48,6 +48,19 @@ namespace CompliaShield.Sdk.Cryptography.Hashing
             return GetSha1HashBytes(preHashBytes);
         }
 
+        public static string GetSha256Hash(object input)
+        {
+            var preHashBytes = ConvertObjectToPreHashBytes(input);
+            var hashBytes = GetSha256HashBytes(preHashBytes);
+            return hashBytes.ToHexString();
+        }
+
+        public static byte[] GetSha256HashBytes(object input)
+        {
+            var preHashBytes = ConvertObjectToPreHashBytes(input);
+            return GetSha256HashBytes(preHashBytes);
+        }
+
         public static string GetConcatenatedString(IEnumerable<string> input)
         {
 
@@ -72,6 +85,15 @@ namespace CompliaShield.Sdk.Cryptography.Hashing
             using (SHA1 sha1 = SHA1.Create())
             {
                 return sha1.ComputeHash(input);
+            }
+        }
+
+
+        private static byte[] GetSha256HashBytes(byte[] input)
+        {
+            using (SHA256Managed sha256 = new SHA256Managed())
+            {
+                return sha256.ComputeHash(input);
             }
         }
 

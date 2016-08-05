@@ -191,8 +191,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             var cert2Dual = LoadCertificate2();
             var publicKey2 = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2Dual);
             var privateKey2 = X509CertificateHelper.GetKeyEncryptionKey(cert2Dual);
-
-
+            
             int length = 100;
             var rand = new RandomGenerator();
             for (int i = 0; i < length; i++)

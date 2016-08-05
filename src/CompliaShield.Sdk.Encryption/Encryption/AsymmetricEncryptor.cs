@@ -39,6 +39,16 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
 
         #region key generation
 
+        public static string EncryptToBase64String(SecureString passwordToProtect, IPublicKey publicKey)
+        {
+            if(publicKey == null)
+            {
+                throw new ArgumentNullException(nameof(publicKey));
+            }
+            var rsa = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(publicKey);
+            return EncryptToBase64String(passwordToProtect, publicKey.KeyId, rsa);
+        }
+
         public static string EncryptToBase64String(SecureString passwordToProtect, string keyId, RSACryptoServiceProvider publicKey)
         {
             return EncryptToBase64String(passwordToProtect, keyId, publicKey, null, null);
