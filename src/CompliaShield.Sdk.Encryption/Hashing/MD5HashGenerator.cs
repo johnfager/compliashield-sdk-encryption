@@ -165,7 +165,7 @@ namespace CompliaShield.Sdk.Cryptography.Hashing
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < result.Length; i++)
                 {
-                    sb.Append(result[i].ToString("X2"));
+                    sb.Append(result[i].ToString("x2"));
                 }
 
                 // And return it

@@ -83,33 +83,33 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
         }
 
 
-        public static RSACryptoServiceProvider GetRSACryptoServiceProviderFromPublicKey(IPublicKey publicKey)
-        {
-            if (publicKey == null)
-            {
-                throw new ArgumentNullException(nameof(publicKey));
-            }
+        //public static RSACryptoServiceProvider GetRSACryptoServiceProviderFromPublicKey(IPublicKey publicKey)
+        //{
+        //    if (publicKey == null)
+        //    {
+        //        throw new ArgumentNullException(nameof(publicKey));
+        //    }
           
-            if (publicKey.PublicKey == null)
-            {
-                throw new ArgumentException("publicKey.PublicKey.Key must be populated.");
-            }
+        //    if (publicKey.PublicKey == null)
+        //    {
+        //        throw new ArgumentException("publicKey.PublicKey.Key must be populated.");
+        //    }
 
-            try
-            {
-                var rsa = publicKey.PublicKey.Key as RSACryptoServiceProvider;
-                if (rsa != null)
-                {
-                    return rsa;
-                }
-            }
-            catch (Exception ex)
-            {
-                var outerEx = new CryptographicException(string.Format("X509Certificate2 with thumbprint '{0}' indicates that HasPrivateKey is TRUE, but the service or account may not have access to the private key or the private key may be missing or corrupted.", publicKey.KeyId), ex);
-                throw outerEx;
-            }
-            throw new CryptographicException(string.Format("X509Certificate2 with thumbprint '{0}' does not have a valid RSA public key.", publicKey.KeyId));
-        }
+        //    try
+        //    {
+        //        var rsa = publicKey.PublicKey.Key as RSACryptoServiceProvider;
+        //        if (rsa != null)
+        //        {
+        //            return rsa;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var outerEx = new CryptographicException(string.Format("X509Certificate2 with thumbprint '{0}' indicates that HasPrivateKey is TRUE, but the service or account may not have access to the private key or the private key may be missing or corrupted.", publicKey.KeyId), ex);
+        //        throw outerEx;
+        //    }
+        //    throw new CryptographicException(string.Format("X509Certificate2 with thumbprint '{0}' does not have a valid RSA public key.", publicKey.KeyId));
+        //}
 
 
         public static RSACryptoServiceProvider GetRSACryptoServiceProviderFromPublicKey(string publicKeyPem)

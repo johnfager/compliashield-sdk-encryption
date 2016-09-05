@@ -61,7 +61,6 @@
     <Compile Include="Encryption\SerializationHelpers\DictionaryOfStringConverter.cs" />
     <Compile Include="Encryption\SerializationHelpers\KeyValuePairOfString.cs" />
     <Compile Include="Encryption\SerializationHelpers\StringDictionaryCaseInsensitive.cs" />
-    <Compile Include="Extensions\KeyExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Utilities\StringWriterWithEncoding.cs" />
     <Compile Include="X509Certificates\CertificatePolicy.cs" />

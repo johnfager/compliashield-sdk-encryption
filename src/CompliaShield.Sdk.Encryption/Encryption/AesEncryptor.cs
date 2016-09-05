@@ -80,6 +80,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             return Encrypt_Private_v1(plainText, passPhrase, 5, useBase36);
         }
 
+
         /// <summary>
         /// AES 256 with 5 iterations.
         /// </summary>
@@ -89,6 +90,45 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
         public static byte[] Encrypt5(byte[] unencryptedBytes, byte[] passPhraseAsBytes)
         {
             return Encrypt_Private_v1(unencryptedBytes, passPhraseAsBytes, 5);
+        }
+
+        #endregion
+
+
+        #region AES1000
+
+        /// <summary>
+        /// AES 256 with 200 iterations.
+        /// </summary>
+        /// <param name="plainText"></param>
+        /// <param name="passPhrase"></param>
+        /// <returns></returns>
+        public static string Encrypt200(string plainText, SecureString passPhrase)
+        {
+            return Encrypt_Private_v1(plainText, passPhrase, 200, false);
+        }
+        
+        /// <summary>
+        /// AES 256 with 200 iterations.
+        /// </summary>
+        /// <param name="plainText"></param>
+        /// <param name="passPhrase"></param>
+        /// <param name="useBase36">True returns a base36 encoding set to lowercase for legibility.</param>
+        /// <returns></returns>
+        public static string Encrypt200(string plainText, SecureString passPhrase, bool useBase36)
+        {
+            return Encrypt_Private_v1(plainText, passPhrase, 200, useBase36);
+        }
+
+        /// <summary>
+        /// AES 256 with 200 iterations.
+        /// </summary>
+        /// <param name="unencryptedBytes"></param>
+        /// <param name="passPhraseAsBytes"></param>
+        /// <returns></returns>
+        public static byte[] Encrypt200(byte[] unencryptedBytes, byte[] passPhraseAsBytes)
+        {
+            return Encrypt_Private_v1(unencryptedBytes, passPhraseAsBytes, 200);
         }
 
         #endregion
@@ -166,6 +206,10 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
                 case 5:
                     iterationSetting = (byte)2;
                     saltLength = 8;
+                    break;
+                case 200:
+                    iterationSetting = (byte)3;
+                    saltLength = 32;
                     break;
                 case 1000:
                     iterationSetting = (byte)10;
@@ -313,6 +357,10 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
                 case 2:
                     iterations = 5;
                     saltByteCount = 8;
+                    break;
+                case 3:
+                    iterations = 200;
+                    saltByteCount = 32;
                     break;
                 case 10:
                     iterations = 1000;

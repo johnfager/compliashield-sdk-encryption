@@ -185,13 +185,13 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             byte[] keyOut;
             try
             {
-                keyOut = alg.Decrypt(encryptedKey, false);
+                keyOut = await Task.FromResult(alg.Decrypt(encryptedKey, false));
             }
             catch (Exception ex)
             {
                 throw new CryptographicException(string.Format("X509Certificate2 with thumbprint '{0}' throw an exception on Decrypt. See inner exception for details", _x5092.Thumbprint), ex);
             }
-            return await Task.FromResult(keyOut);
+            return keyOut;
         }
 
         public async Task<bool> VerifyAsync(byte[] digest, byte[] signature, string algorithm)
@@ -299,7 +299,36 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
                     throw new NotImplementedException(string.Format("algorithm '{0}' is not implemented.", algorithm));
             }
         }
+        
+        public async Task<byte[]> WrapKeyAsync(byte[] key)
+        {
+            return await this.WrapKeyAsync(key,  CancellationToken.None);
+        }
 
+        public async Task<byte[]> WrapKeyAsync(byte[] key, CancellationToken token)
+        {
+            if (key == null)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+            //if (algorithm == null)
+            //{
+            //    throw new ArgumentNullException(nameof(algorithm));
+            //}
+
+            this.EnsureNotDisposed();
+            if (this.PublicKey == null)
+            {
+                throw new InvalidOperationException("There is no PublicKey");
+            }
+
+            var fOAEP = false;
+            var rsa = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(_x5092);
+            var encrypted = await Task.FromResult(rsa.Encrypt(key, fOAEP));
+            return encrypted;
+            //var encryptedAsString = Encoding.UTF8.GetString(encrypted);
+            //return new Tuple<byte[], string>(encrypted, encryptedAsString);
+        }
 
         public string PublicKeyToPEM()
         {

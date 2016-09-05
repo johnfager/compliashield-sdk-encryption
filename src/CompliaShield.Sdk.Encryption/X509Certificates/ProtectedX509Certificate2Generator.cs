@@ -51,16 +51,17 @@ namespace CompliaShield.Sdk.X509Certificates
             {
                 throw new ArgumentNullException("keyProtectorPublicKey");
             }
-            if (keyProtector.PublicKey == null)
-            {
-                throw new ArgumentNullException("keyProtectorPublicKey.PublicKey");
-            }
 
-            var publicKeyProvider = keyProtector.PublicKey.Key as RSACryptoServiceProvider;
-            if (publicKeyProvider == null)
-            {
-                throw new NotImplementedException("keyProtectorPublicKey.PublicKey.Key must be a valid RSACryptoServiceProvider");
-            }
+            //if (keyProtector.PublicKey == null)
+            //{
+            //    throw new ArgumentNullException("keyProtectorPublicKey.PublicKey");
+            //}
+
+            //var publicKeyProvider = keyProtector.PublicKey.Key as RSACryptoServiceProvider;
+            //if (publicKeyProvider == null)
+            //{
+            //    throw new NotImplementedException("keyProtectorPublicKey.PublicKey.Key must be a valid RSACryptoServiceProvider");
+            //}
 
             string thumbprint;
             string pemPublicCert;
@@ -74,7 +75,7 @@ namespace CompliaShield.Sdk.X509Certificates
 
             var encryptor = new AsymmetricEncryptor() { AsymmetricStrategy = AsymmetricStrategyOption.Aes256_1000 };
 
-            var asymEncObj = encryptor.EncryptObject(pkcs12Data, keyProtector.KeyId, publicKeyProvider);
+            var asymEncObj = encryptor.EncryptObjectAsync(pkcs12Data, keyProtector).GetAwaiter().GetResult();
             if (string.IsNullOrEmpty(asymEncObj.KeyId) || asymEncObj.KeyId.Length != 40)
             {
                 throw new InvalidOperationException("AsymmetricEncryptor.EncryptObject returned without KeyId populated.");

@@ -99,7 +99,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
                 throw new CryptographicException(string.Format("encryptedKey successfull decrypted but was not a valid PFX byte array. Type was '{0}'.", decrypted.GetType().FullName));
             }
             // re-encrypt the key
-            var newAsymEncObj = await asymEnc.EncryptObjectAsync(pfxBytes, newKeyProtector.KeyId, newKeyProtector);
+            var newAsymEncObj = await asymEnc.EncryptObjectAsync(pfxBytes, newKeyProtector);
             _encryptedKey = newAsymEncObj;
         }
 

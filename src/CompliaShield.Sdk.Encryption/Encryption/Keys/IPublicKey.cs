@@ -16,7 +16,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 
         DateTime NotAfter { get; }
 
-        PublicKey PublicKey { get; }
+        //PublicKey PublicKey { get; }
 
         Task<bool> VerifyAsync(byte[] digest, byte[] signature, string algorithm);
 
@@ -30,7 +30,11 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 
         Task<bool> VerifyAsync(string hex, string signature, CancellationToken token);
 
-        string PublicKeyToPEM();
+        Task<byte[]> WrapKeyAsync(byte[] key);
+
+        Task<byte[]> WrapKeyAsync(byte[] key, CancellationToken token);
+
+        //string PublicKeyToPEM();
 
     }
 }

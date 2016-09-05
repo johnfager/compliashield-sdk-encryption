@@ -17,6 +17,9 @@ namespace CompliaShield.Sdk.Cryptography.Tests
     using Org.BouncyCastle.OpenSsl;
     using Org.BouncyCastle.Crypto.Parameters;
     using Org.BouncyCastle.Security;
+    using Encryption.Keys;
+
+
     public class RSAKey
     {
         public string PublicPEM { get; set; }
@@ -48,9 +51,9 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             //var b64 = "ssh-rsa " + Convert.ToBase64String(output.ToArray());
             ////Console.WriteLine(b64);
 
-            
+
             //RsaKeyParameters r = DotNetUtilities.GetRsaPublicKey(parameters);
-            
+
             //byte[] sshrsa_bytes = Encoding.Default.GetBytes("ssh-rsa");
             //byte[] n = r.Modulus.ToByteArray();
             //byte[] e = r.Exponent.ToByteArray();
@@ -90,20 +93,20 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         {
             var cert2 = LoadCertificate();
 
-            var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
+            var publicKey = new X509CertificatePublicKey(cert2);
+            var privateKey = new X509Certificate2KeyEncryptionKey(cert2);
 
             var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
 
             var encryptor = new AsymmetricEncryptor() { AsymmetricStrategy = AsymmetricStrategyOption.Aes256_1000 };
 
-            var asymEncObj = encryptor.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToLower(), publicKey);
+            var asymEncObj = encryptor.EncryptObjectAsync(stringToEncrypt, publicKey).GetAwaiter().GetResult();
             asymEncObj.PublicMetadata = new Dictionary<string, string>();
             asymEncObj.PublicMetadata["keyA"] = "valueA";
             asymEncObj.PublicMetadata["keyB"] = "valueB";
 
 
-            var asymEncObj2 = encryptor.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToLower(), publicKey);
+            var asymEncObj2 = encryptor.EncryptObjectAsync(stringToEncrypt, publicKey).GetAwaiter().GetResult();
             asymEncObj.PublicMetadata = new Dictionary<string, string>();
             asymEncObj.PublicMetadata["keyA-2"] = "valueA-2";
             asymEncObj.PublicMetadata["keyB-2"] = "valueB-2";
@@ -118,7 +121,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             backup.BackupObjects["objA"] = asymEncObj;
             backup.BackupObjects["objB"] = asymEncObj2;
 
-            var asymBackup = encryptor.EncryptObject(backup, cert2.Thumbprint, publicKey);
+            var asymBackup = encryptor.EncryptObjectAsync(backup, publicKey).GetAwaiter().GetResult();
             var decrypted = encryptor.DecryptObject(asymBackup, privateKey);
 
             Assert.IsTrue(decrypted is AsymmetricallyEncryptedBackupObject);
@@ -150,8 +153,8 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         public void TestProtectPassword()
         {
             var cert2 = LoadCertificate();
-            var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
+            var publicKey = new X509CertificatePublicKey(cert2);
+            var privateKey = new X509Certificate2KeyEncryptionKey(cert2);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -171,9 +174,9 @@ namespace CompliaShield.Sdk.Cryptography.Tests
                     var decryptedBase36 = AesEncryptor.Decrypt(encryptedBase36, password, true);
                     Assert.AreEqual(stringToEncrypt, decryptedBase36);
 
-                    var protectedPwStr = AsymmetricEncryptor.EncryptToBase64String(password, cert2.Thumbprint.ToString().ToLower(), publicKey);
+                    var protectedPwStr = AsymmetricEncryptor.EncryptToBase64StringAsync(password, publicKey).GetAwaiter().GetResult();
 
-                    var unprotectedPwdStr = AsymmetricEncryptor.DecryptFromBase64String(protectedPwStr, privateKey);
+                    var unprotectedPwdStr = AsymmetricEncryptor.DecryptFromBase64StringAsync(protectedPwStr, privateKey).GetAwaiter().GetResult();
 
                     var decryptedString = AesEncryptor.Decrypt(encryptedBase64, unprotectedPwdStr);
                     Assert.AreEqual(stringToEncrypt, decryptedString);
@@ -185,13 +188,13 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         public void TestProtectPasswordDualKey()
         {
             var cert2 = LoadCertificate();
-            var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
+            var publicKey = new X509CertificatePublicKey(cert2);
+            var privateKey = new X509Certificate2KeyEncryptionKey(cert2);
 
             var cert2Dual = LoadCertificate2();
-            var publicKey2 = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2Dual);
-            var privateKey2 = X509CertificateHelper.GetKeyEncryptionKey(cert2Dual);
-            
+            var publicKey2 = new X509CertificatePublicKey(cert2Dual);
+            var privateKey2 = new X509Certificate2KeyEncryptionKey(cert2Dual);
+
             int length = 100;
             var rand = new RandomGenerator();
             for (int i = 0; i < length; i++)
@@ -210,7 +213,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
                     var decryptedBase36 = AesEncryptor.Decrypt(encryptedBase36, password, true);
                     Assert.AreEqual(stringToEncrypt, decryptedBase36);
 
-                    var protectedPwStr = AsymmetricEncryptor.EncryptToBase64String(password, cert2.Thumbprint.ToString().ToLower(), publicKey, cert2Dual.Thumbprint.ToString().ToLower(), publicKey2);
+                    var protectedPwStr = AsymmetricEncryptor.EncryptToBase64StringAsync(password, publicKey, publicKey2).GetAwaiter().GetResult();
 
                     var unprotectedPwdStr = AsymmetricEncryptor.DecryptFromBase64String(protectedPwStr, privateKey, privateKey2);
 
@@ -242,7 +245,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
                 }
             }
         }
-
+        
         [TestMethod]
         public void TestAes1000_Bytes()
         {
@@ -268,6 +271,64 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
                 // base 64
                 var encryptedBytes = AesEncryptor.Encrypt1000(bytes, newKey);
+                var decryptedBytes = AesEncryptor.Decrypt(encryptedBytes, newKey);
+
+                Assert.IsTrue(decryptedBytes.SequenceEqual(bytes));
+
+                var decryptedString = System.Text.Encoding.UTF8.GetString(decryptedBytes);
+                Assert.AreEqual(stringToEncrypt, decryptedString);
+
+
+            }
+        }
+
+        [TestMethod]
+        public void TestAes200()
+        {
+            int length = 100;
+            var rand = new RandomGenerator();
+            for (int i = 0; i < length; i++)
+            {
+                using (var password = rand.RandomSecureStringPassword(10, 50))
+                {
+                    var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
+                    // base 64
+                    var encryptedBase64 = AesEncryptor.Encrypt200(stringToEncrypt, password);
+                    var decryptedBase64 = AesEncryptor.Decrypt(encryptedBase64, password);
+                    Assert.AreEqual(stringToEncrypt, decryptedBase64);
+                    // base 36
+                    var encryptedBase36 = AesEncryptor.Encrypt200(stringToEncrypt, password, true);
+                    var decryptedBase36 = AesEncryptor.Decrypt(encryptedBase36, password, true);
+                    Assert.AreEqual(stringToEncrypt, decryptedBase36);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestAes200_Bytes()
+        {
+            int length = 100;
+            var rand = new RandomGenerator();
+
+            //byte[] entropy = new byte[20];
+
+
+            for (int i = 0; i < length; i++)
+            {
+
+                byte[] newKey = new byte[rand.RandomNumber(75, 88)];
+                using (var rng = new RNGCryptoServiceProvider())
+                {
+                    //rng.GetBytes(entropy);
+                    rng.GetBytes(newKey);
+                }
+
+                var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
+
+                var bytes = System.Text.Encoding.UTF8.GetBytes(stringToEncrypt);
+
+                // base 64
+                var encryptedBytes = AesEncryptor.Encrypt200(bytes, newKey);
                 var decryptedBytes = AesEncryptor.Decrypt(encryptedBytes, newKey);
 
                 Assert.IsTrue(decryptedBytes.SequenceEqual(bytes));
@@ -321,8 +382,8 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
             var cert2 = LoadCertificate();
 
-            var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
+            var publicKey = new X509CertificatePublicKey(cert2);
+            var privateKey = new X509Certificate2KeyEncryptionKey(cert2);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -331,7 +392,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             {
                 var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
                 var asymEnc = new AsymmetricEncryptor(AsymmetricStrategyOption.Legacy_Aes2);
-                var asymObj = asymEnc.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToString().ToLower(), publicKey);
+                var asymObj = asymEnc.EncryptObjectAsync(stringToEncrypt, publicKey).GetAwaiter().GetResult();
                 var decrypted = asymEnc.DecryptObject(asymObj, privateKey);
                 Assert.AreEqual(stringToEncrypt, decrypted);
             }
@@ -342,8 +403,8 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         {
             var cert2 = LoadCertificate();
 
-            var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
+            var publicKey = new X509CertificatePublicKey(cert2);
+            var privateKey = new X509Certificate2KeyEncryptionKey(cert2);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -360,7 +421,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
 
             var encryptor = new AsymmetricEncryptor() { AsymmetricStrategy = AsymmetricStrategyOption.Aes256_1000 };
-            var asymEncObj = encryptor.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToLower(), publicKey);
+            var asymEncObj = encryptor.EncryptObjectAsync(stringToEncrypt, publicKey).GetAwaiter().GetResult();
 
             asymEncObj.PublicMetadata = new Dictionary<string, string>();
             asymEncObj.PublicMetadata["keyA"] = "valueA";
@@ -397,8 +458,8 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         {
             var cert2 = LoadCertificate();
 
-            var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
+            var publicKey = new X509CertificatePublicKey(cert2);
+            var privateKey = new X509Certificate2KeyEncryptionKey(cert2);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -407,7 +468,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             {
                 var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
                 var asymEnc = new AsymmetricEncryptor(AsymmetricStrategyOption.Aes256_1000);
-                var asymObj = asymEnc.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToString().ToLower(), publicKey);
+                var asymObj = asymEnc.EncryptObjectAsync(stringToEncrypt, publicKey).GetAwaiter().GetResult();
                 var decrypted = asymEnc.DecryptObject(asymObj, privateKey);
                 Assert.AreEqual(stringToEncrypt, decrypted);
             }
@@ -418,8 +479,8 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         {
             var cert2 = LoadCertificate();
 
-            var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
+            var publicKey = new X509CertificatePublicKey(cert2);
+            var privateKey = new X509Certificate2KeyEncryptionKey(cert2);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -428,7 +489,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             {
                 var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
                 var asymEnc = new AsymmetricEncryptor(AsymmetricStrategyOption.Aes256_5);
-                var asymObj = asymEnc.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToString().ToLower(), publicKey);
+                var asymObj = asymEnc.EncryptObjectAsync(stringToEncrypt, publicKey).GetAwaiter().GetResult();
                 var decrypted = asymEnc.DecryptObject(asymObj, privateKey);
                 Assert.AreEqual(stringToEncrypt, decrypted);
             }
@@ -440,12 +501,12 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         {
 
             var cert2 = LoadCertificate();
-            var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
+            var publicKey = new X509CertificatePublicKey(cert2);
+            var privateKey = new X509Certificate2KeyEncryptionKey(cert2);
 
             var cert2Dual = LoadCertificate2();
-            var publicKey2 = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2Dual);
-            var privateKey2 = X509CertificateHelper.GetKeyEncryptionKey(cert2Dual);
+            var publicKey2 = new X509CertificatePublicKey(cert2Dual);
+            var privateKey2 = new X509Certificate2KeyEncryptionKey(cert2Dual);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -454,7 +515,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             {
                 var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
                 var asymEnc = new AsymmetricEncryptor(AsymmetricStrategyOption.Legacy_Aes2);
-                var asymObj = asymEnc.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToString().ToLower(), publicKey, cert2Dual.Thumbprint.ToString().ToLower(), publicKey2);
+                var asymObj = asymEnc.EncryptObjectAsync(stringToEncrypt, publicKey, publicKey2).GetAwaiter().GetResult();
                 var decrypted = asymEnc.DecryptObject(asymObj, privateKey, privateKey2);
                 Assert.AreEqual(stringToEncrypt, decrypted);
             }
@@ -465,12 +526,12 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         {
 
             var cert2 = LoadCertificate();
-            var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
+            var publicKey = new X509CertificatePublicKey(cert2);
+            var privateKey = new X509Certificate2KeyEncryptionKey(cert2);
 
             var cert2Dual = LoadCertificate2();
-            var publicKey2 = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2Dual);
-            var privateKey2 = X509CertificateHelper.GetKeyEncryptionKey(cert2Dual);
+            var publicKey2 = new X509CertificatePublicKey(cert2Dual);
+            var privateKey2 = new X509Certificate2KeyEncryptionKey(cert2Dual);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -479,7 +540,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             {
                 var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
                 var asymEnc = new AsymmetricEncryptor(AsymmetricStrategyOption.Aes256_1000);
-                var asymObj = asymEnc.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToString().ToLower(), publicKey, cert2Dual.Thumbprint.ToString().ToLower(), publicKey2);
+                var asymObj = asymEnc.EncryptObjectAsync(stringToEncrypt, publicKey, publicKey2).GetAwaiter().GetResult();
                 var decrypted = asymEnc.DecryptObject(asymObj, privateKey, privateKey2);
                 Assert.AreEqual(stringToEncrypt, decrypted);
             }
@@ -490,12 +551,12 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         {
 
             var cert2 = LoadCertificate();
-            var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            var privateKey = X509CertificateHelper.GetKeyEncryptionKey(cert2);
+            var publicKey = new X509CertificatePublicKey(cert2);
+            var privateKey = new X509Certificate2KeyEncryptionKey(cert2);
 
             var cert2Dual = LoadCertificate2();
-            var publicKey2 = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2Dual);
-            var privateKey2 = X509CertificateHelper.GetKeyEncryptionKey(cert2Dual);
+            var publicKey2 = new X509CertificatePublicKey(cert2Dual);
+            var privateKey2 = new X509Certificate2KeyEncryptionKey(cert2Dual);
 
             int length = 100;
             var rand = new RandomGenerator();
@@ -504,7 +565,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             {
                 var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
                 var asymEnc = new AsymmetricEncryptor(AsymmetricStrategyOption.Aes256_5);
-                var asymObj = asymEnc.EncryptObject(stringToEncrypt, cert2.Thumbprint.ToString().ToLower(), publicKey, cert2Dual.Thumbprint.ToString().ToLower(), publicKey2);
+                var asymObj = asymEnc.EncryptObject(stringToEncrypt, publicKey, publicKey2);
                 var decrypted = asymEnc.DecryptObject(asymObj, privateKey, privateKey2);
                 Assert.AreEqual(stringToEncrypt, decrypted);
             }
