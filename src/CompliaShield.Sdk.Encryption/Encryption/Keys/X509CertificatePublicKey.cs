@@ -189,6 +189,37 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
         }
 
 
+        public async Task<byte[]> WrapKeyAsync(byte[] key)
+        {
+            return await this.WrapKeyAsync(key, CancellationToken.None);
+        }
+
+        public async Task<byte[]> WrapKeyAsync(byte[] key, CancellationToken token)
+        {
+            if (key == null)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+            //if (algorithm == null)
+            //{
+            //    throw new ArgumentNullException(nameof(algorithm));
+            //}
+
+            this.EnsureNotDisposed();
+            if (this.PublicKey == null)
+            {
+                throw new InvalidOperationException("There is no PublicKey");
+            }
+
+            var fOAEP = false;
+            var rsa = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(_x5092);
+            var encrypted = await Task.FromResult(rsa.Encrypt(key, fOAEP));
+            return encrypted;
+            //var encryptedAsString = Encoding.UTF8.GetString(encrypted);
+            //return new Tuple<byte[], string>(encrypted, encryptedAsString);
+        }
+
+
         public string PublicKeyToPEM()
         {
             this.EnsureNotDisposed();
@@ -223,7 +254,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             }
             return alg;
         }
-        
+
         #endregion
 
     }

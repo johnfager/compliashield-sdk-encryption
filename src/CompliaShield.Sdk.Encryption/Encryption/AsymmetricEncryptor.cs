@@ -330,6 +330,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
                 dualPw.EncryptedPassphrase1 = encRes1;
 
                 // get encryption from key2
+                var encRes2 = await publicKey2.WrapKeyAsync(passPhrase2AsBytes);
                 dualPw.EncryptedPassphrase2 = encRes2;
 
                 encryptedPassPhraseAsBytes = Encoding.UTF8.GetBytes(Serializer.SerializeToJson(dualPw));
