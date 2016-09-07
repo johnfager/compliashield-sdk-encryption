@@ -95,7 +95,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
         #endregion
 
 
-        #region AES1000
+        #region AES200
 
         /// <summary>
         /// AES 256 with 200 iterations.
