@@ -16,17 +16,16 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
     public partial class X509CertificatePublicKey : IPublicKey
     {
 
-        private X509Certificate2 _x5092;
+        protected X509Certificate2 _x5092;
 
-        private bool _isDisposed;
 
-        public bool IsDisposed { get { return _isDisposed; } }
+        public virtual string KeyLocator { get; set; }
 
-        public string Actor { get; set; }
+        public virtual string Actor { get; set; }
 
-        public string KeyId { get; private set; }
+        public virtual string KeyId { get; protected set; }
 
-        public DateTime NotBefore
+        public virtual DateTime NotBefore
         {
             get
             {
@@ -39,7 +38,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             }
         }
 
-        public DateTime NotAfter
+        public virtual DateTime NotAfter
         {
             get
             {
@@ -52,7 +51,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             }
         }
 
-        public PublicKey PublicKey
+        public virtual PublicKey PublicKey
         {
             get
             {
@@ -60,6 +59,8 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
                 return _x5092.PublicKey;
             }
         }
+
+        public virtual bool Disabled { get; protected set; }
 
         #region .ctors
 
@@ -79,12 +80,17 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             }
             _x5092 = x509Certificate2;
         }
+        
+        protected bool _isDisposed;
+
+        public virtual bool IsDisposed { get { return _isDisposed; } }
 
         #endregion
 
+
         public async Task<bool> VerifyAsync(byte[] digest, byte[] signature, string algorithm)
         {
-            return await this.VerifyAsync(digest, signature, algorithm, new CancellationToken());
+            return await this.VerifyAsync(digest, signature, algorithm, CancellationToken.None);
         }
 
         /// <summary>
@@ -108,24 +114,13 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             }
 
             var verifier = new Signing.Verifier(this.GetPublicRSACryptoServiceProvider());
-
-            algorithm = algorithm.ToLower();
-            switch (algorithm)
-            {
-                case "md5":
-                    var hashMd5 = BasicHasher.GetMd5HashBytes(digest);
-                    return await Task.FromResult(verifier.VerifyMd5Hash(hashMd5, signature));
-                case "sha1":
-                    var hashSha1 = BasicHasher.GetSha1HashBytes(digest);
-                    return await Task.FromResult(verifier.VerifySha1Hash(hashSha1, signature));
-                default:
-                    throw new NotImplementedException(string.Format("algorithm '{0}' is not implemented.", algorithm));
-            }
+            //var hash = BasicHasher.GetHash(digest, algorithm);
+            return await Task.FromResult(verifier.VerifyHash(digest, signature, algorithm));
         }
 
         public async Task<bool> VerifyAsync(byte[] digest, string signature, string algorithm)
         {
-            return await this.VerifyAsync(digest, signature, algorithm, new CancellationToken());
+            return await this.VerifyAsync(digest, signature, algorithm, CancellationToken.None);
         }
 
         public async Task<bool> VerifyAsync(byte[] digest, string signature, string algorithm, CancellationToken token)
@@ -135,65 +130,44 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             {
                 throw new ArgumentException("digest");
             }
-            if (algorithm == null)
-            {
-                throw new ArgumentNullException("algorithm");
-            }
-
+            BasicHasher.ValidateDigestLength(algorithm, digest);
             var verifier = new Signing.Verifier(this.GetPublicRSACryptoServiceProvider());
 
-            algorithm = algorithm.ToLower();
-            switch (algorithm)
+            var hex = digest.ToHexString();
+            var res = await Task.FromResult(verifier.VerifyHash(hex, signature, algorithm));
+
+            //var res = await Task.FromResult(verifier.VerifyHash(digest, signature, algorithm));
+
+            if (!res)
             {
-                case "md5":
-                    var hashMd5 = BasicHasher.GetMd5Hash(digest);
-                    return await Task.FromResult(verifier.VerifyMd5Hash(hashMd5, signature));
-                case "sha1":
-                    var hashSha1 = BasicHasher.GetSha1Hash(digest);
-                    return await Task.FromResult(verifier.VerifySha1Hash(hashSha1, signature));
-                default:
-                    throw new NotImplementedException(string.Format("algorithm '{0}' is not implemented.", algorithm));
+                // legacy code used a double digest hash, so hash once more and check
+                var hashBytesLegacy = BasicHasher.GetHashBytes(digest, algorithm);
+                res = await Task.FromResult(verifier.VerifyHash(digest, signature, algorithm));
+                return res;
             }
+            return res;
         }
 
         public async Task<bool> VerifyAsync(string hex, string signature)
         {
-            return await this.VerifyAsync(hex, signature, new CancellationToken());
+            return await this.VerifyAsync(hex, signature, CancellationToken.None);
         }
 
         public async Task<bool> VerifyAsync(string hex, string signature, CancellationToken token)
         {
             this.EnsureNotDisposed();
-            if (hex == null || !(hex.Length == 32 | hex.Length == 40 | hex.Length == 64))
-            {
-                throw new ArgumentException("hex must be a valid MD5, SHA1 or SHA256 hash in HEX format");
-            }
-            string algorithm = "md5";
-            if (hex.Length == 40)
-            {
-                algorithm = "sha1";
-            }
-            else if(hex.Length == 64)
-            {
-                algorithm = "sha256";
-            }
-
+            string algorithm = BasicHasher.GetNormalAlgorithm(hex);
             var verifier = new Signing.Verifier(this.GetPublicRSACryptoServiceProvider());
-
-            algorithm = algorithm.ToLower();
-            switch (algorithm)
+            var res = await Task.FromResult(verifier.VerifyHash(hex, signature, algorithm));
+            if (!res)
             {
-                case "md5":
-                    return await Task.FromResult(verifier.VerifyMd5Hash(hex, signature));
-                case "sha1":
-                    return await Task.FromResult(verifier.VerifySha1Hash(hex, signature));
-                case "sha256":
-                    return await Task.FromResult(verifier.VerifySha256Hash(hex, signature));
-                default:
-                    throw new NotImplementedException(string.Format("algorithm '{0}' is not implemented.", algorithm));
+                // legacy code used a double digest hash, so hash once more and check
+                var hashHexLegacy = BasicHasher.GetHash(hex, algorithm);
+                res = await Task.FromResult(verifier.VerifyHash(hashHexLegacy, signature, algorithm));
+                return res;
             }
+            return res;
         }
-
 
         public async Task<byte[]> WrapKeyAsync(byte[] key)
         {
@@ -211,7 +185,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             //    throw new ArgumentNullException(nameof(algorithm));
             //}
 
-            this.EnsureNotDisposed();
+            this.EnsureUsable();
             if (this.PublicKey == null)
             {
                 throw new InvalidOperationException("There is no PublicKey");
@@ -225,27 +199,36 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             //return new Tuple<byte[], string>(encrypted, encryptedAsString);
         }
 
-
         public string PublicKeyToPEM()
         {
-            this.EnsureNotDisposed();
+            this.EnsureUsable();
             return X509CertificateHelper.ExportToPEM(_x5092);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             _isDisposed = true;
         }
 
         #region helpers
 
-        private void EnsureNotDisposed()
+        protected virtual void EnsureNotDisposed()
         {
             if (_isDisposed)
             {
                 throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
+
+        protected virtual void EnsureUsable()
+        {
+            this.EnsureNotDisposed();
+            if (this.Disabled)
+            {
+                throw new InvalidOperationException(string.Format("Key '{0}' is disabled.", this.KeyId));
+            }
+        }
+
 
         private RSACryptoServiceProvider GetPublicRSACryptoServiceProvider()
         {

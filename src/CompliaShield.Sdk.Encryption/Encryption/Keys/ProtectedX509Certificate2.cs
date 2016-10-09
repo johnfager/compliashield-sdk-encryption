@@ -75,7 +75,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 
         #region methods
 
-        public async Task UpdateKeyProtectorAsync(IKeyEncyrptionKey currentKeyProtector, IPublicKey newKeyProtector)
+        public async Task UpdateKeyProtectorAsync(IPrivateKey currentKeyProtector, IPublicKey newKeyProtector)
         {
             if (currentKeyProtector == null)
             {
@@ -103,7 +103,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             _encryptedKey = newAsymEncObj;
         }
 
-        public async Task<IKeyEncyrptionKey> ToKeyEncyrptionKeyAsync(IKeyEncyrptionKey keyProtector)
+        public async Task<IPrivateKey> ToKeyEncyrptionKeyAsync(IPrivateKey keyProtector)
         {
             if (keyProtector == null)
             {
@@ -123,7 +123,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
             {
                 throw new CryptographicException(string.Format("encryptedKey successfull decrypted but was not a valid PFX byte array. Type was '{0}'.", decrypted.GetType().FullName));
             }
-            IKeyEncyrptionKey protectedKeyAsKeyEncryptionKey;
+            IPrivateKey protectedKeyAsKeyEncryptionKey;
             try
             {
                 var x509 = new X509Certificate2(pfxBytes);

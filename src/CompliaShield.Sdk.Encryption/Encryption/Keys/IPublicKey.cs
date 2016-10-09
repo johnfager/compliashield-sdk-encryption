@@ -8,6 +8,8 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 
     public interface IPublicKey : IDisposable
     {
+        string KeyLocator { get; }
+
         string Actor { get; set; }
 
         string KeyId { get; }
@@ -15,6 +17,8 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
         DateTime NotBefore { get; }
 
         DateTime NotAfter { get; }
+
+        bool Disabled { get; }
 
         //PublicKey PublicKey { get; }
 

@@ -101,17 +101,17 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             return Convert.ToBase64String(bytes);
         }
 
-        public static SecureString DecryptFromBase64String(string encryptedValueAsBase64String, IKeyEncyrptionKey privateKey)
+        public static SecureString DecryptFromBase64String(string encryptedValueAsBase64String, IPrivateKey privateKey)
         {
             return DecryptFromBase64String(encryptedValueAsBase64String, privateKey, null);
         }
 
-        public static async Task<SecureString> DecryptFromBase64StringAsync(string encryptedValueAsBase64String, IKeyEncyrptionKey privateKey)
+        public static async Task<SecureString> DecryptFromBase64StringAsync(string encryptedValueAsBase64String, IPrivateKey privateKey)
         {
             return await DecryptFromBase64StringAsync(encryptedValueAsBase64String, privateKey, null);
         }
 
-        public static SecureString DecryptFromBase64String(string encryptedValueAsBase64String, IKeyEncyrptionKey privateKey1, IKeyEncyrptionKey privateKey2)
+        public static SecureString DecryptFromBase64String(string encryptedValueAsBase64String, IPrivateKey privateKey1, IPrivateKey privateKey2)
         {
             return AsyncHelper.RunSync(() => DecryptFromBase64StringAsync(encryptedValueAsBase64String, privateKey1, privateKey2));
         }
@@ -122,7 +122,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
         /// <param name="encryptedValueAsBase64String"></param>
         /// <param name="privateKey"></param>
         /// <returns></returns>
-        public static async Task<SecureString> DecryptFromBase64StringAsync(string encryptedValueAsBase64String, IKeyEncyrptionKey privateKey1, IKeyEncyrptionKey privateKey2)
+        public static async Task<SecureString> DecryptFromBase64StringAsync(string encryptedValueAsBase64String, IPrivateKey privateKey1, IPrivateKey privateKey2)
         {
 
             if (string.IsNullOrEmpty(encryptedValueAsBase64String))
@@ -196,22 +196,22 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             return await this.EncryptObject_PrivateAsync(input, publicKey1, publicKey2);
         }
 
-        public object DecryptObject(AsymmetricallyEncryptedObject input, IKeyEncyrptionKey privateKey)
+        public object DecryptObject(AsymmetricallyEncryptedObject input, IPrivateKey privateKey)
         {
             return AsyncHelper.RunSync(() => this.DecryptObjectAsync(input, privateKey));
         }
 
-        public async Task<object> DecryptObjectAsync(AsymmetricallyEncryptedObject input, IKeyEncyrptionKey privateKey)
+        public async Task<object> DecryptObjectAsync(AsymmetricallyEncryptedObject input, IPrivateKey privateKey)
         {
             return await this.DecryptObject_PrivateAsync(input, privateKey, null);
         }
 
-        public object DecryptObject(AsymmetricallyEncryptedObject input, IKeyEncyrptionKey privateKey1, IKeyEncyrptionKey privateKey2)
+        public object DecryptObject(AsymmetricallyEncryptedObject input, IPrivateKey privateKey1, IPrivateKey privateKey2)
         {
             return AsyncHelper.RunSync(() => this.DecryptObject_PrivateAsync(input, privateKey1, privateKey2));
         }
 
-        public async Task<object> DecryptObjectAsync(AsymmetricallyEncryptedObject input, IKeyEncyrptionKey privateKey1, IKeyEncyrptionKey privateKey2)
+        public async Task<object> DecryptObjectAsync(AsymmetricallyEncryptedObject input, IPrivateKey privateKey1, IPrivateKey privateKey2)
         {
             return await this.DecryptObject_PrivateAsync(input, privateKey1, privateKey2);
         }
@@ -358,7 +358,9 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
                 //        And the decrypte expects to use this serializer method.
 
                 string cipher;
+#pragma warning disable 0618
                 asymEncObj.Data = BasicEncryptor.EncryptObject(input, passPhrase + passPhrase2, out cipher);
+#pragma warning restore 0618
                 asymEncObj.CipherText = cipher;
                 asymEncObj.AsymmetricStrategy = AsymmetricStrategyOption.Legacy_Aes2; // critical!!!
             }
@@ -392,7 +394,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             public byte[] EncryptedPassphrase2 { get; set; }
         }
 
-        private async Task<object> DecryptObject_PrivateAsync(AsymmetricallyEncryptedObject input, IKeyEncyrptionKey privateKey1, IKeyEncyrptionKey privateKey2)
+        private async Task<object> DecryptObject_PrivateAsync(AsymmetricallyEncryptedObject input, IPrivateKey privateKey1, IPrivateKey privateKey2)
         {
 
             // Variables
@@ -439,7 +441,9 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             {
                 // deserialize the object using the legacy serialization to a string
                 // unavoidable to preserve
+#pragma warning disable 0618
                 output = BasicEncryptor.DecryptObject(input.Data, input.CipherText, passPhrase);
+#pragma warning restore 0618
             }
             else if (input.AsymmetricStrategy == AsymmetricStrategyOption.Aes256_5)
             {

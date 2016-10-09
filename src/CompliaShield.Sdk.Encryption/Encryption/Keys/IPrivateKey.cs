@@ -8,10 +8,12 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
     using System.Threading;
     using System.Threading.Tasks;
 
+    // was IKeyEncryptionKey
+
     /// <summary>
     /// Abstracts the action of handling unwrapping an encrypted key or signing, allowing for offsite or API access to external key stores including HSM protected key encryption keys.
     /// </summary>
-    public interface IKeyEncyrptionKey : IPublicKey
+    public interface IPrivateKey : IPublicKey
     {
         //string KeyId { get; }
 
