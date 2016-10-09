@@ -29,7 +29,7 @@ namespace CompliaShield.Sdk.X509Certificates
     public sealed class ProtectedX509Certificate2Generator
     {
 
-        private X509Certificate2 _x5092;
+        //private X509Certificate2 _x5092;
 
         #region properties
 

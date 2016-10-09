@@ -14,6 +14,107 @@ namespace CompliaShield.Sdk.Cryptography.Hashing
     public class BasicHasher
     {
 
+        public static void ValidateDigestLength(string algorithm, byte[] digest)
+        {
+            if (digest == null || !digest.Any())
+            {
+                throw new ArgumentException(nameof(digest));
+            }
+
+            algorithm = algorithm.ToUpper();
+#pragma warning disable 0618
+            switch (algorithm)
+            {
+                case BasicHasherAlgorithms.MD5:
+                    if (digest.Length != 16)
+                    {
+                        throw new ArgumentException("MD5 digest must be 16 bytes");
+                    }
+                    break;
+                case BasicHasherAlgorithms.SHA1:
+                    if (digest.Length != 20)
+                    {
+                        throw new ArgumentException("SHA1 digest must be 20 bytes");
+                    }
+                    break;
+                case BasicHasherAlgorithms.SHA256:
+                    if (digest.Length != 32)
+                    {
+                        throw new ArgumentException("SHA256 digest must be 32 bytes");
+                    }
+                    break;
+            }
+#pragma warning restore 0618
+        }
+
+        public static string GetNormalAlgorithm(byte[] digest)
+        {
+            if (digest == null || !digest.Any())
+            {
+                throw new ArgumentException(nameof(digest));
+            }
+#pragma warning disable 0618
+            switch (digest.Length)
+            {
+                case 16:
+                    return BasicHasherAlgorithms.MD5;
+                case 20:
+                    return BasicHasherAlgorithms.SHA1;
+                case 32:
+                    return BasicHasherAlgorithms.SHA256;
+                default:
+                    throw new NotImplementedException(string.Format("Algorithm for digest with '{0}' bytes is not implemented.", digest.Count().ToString()));
+            }
+#pragma warning restore 0618
+        }
+
+        public static string GetNormalAlgorithm(string hex)
+        {
+#pragma warning disable 0618
+            switch (hex.Length)
+            {
+                case 32:
+                    return BasicHasherAlgorithms.MD5;
+                case 40:
+                    return BasicHasherAlgorithms.SHA1;
+                case 64:
+                    return BasicHasherAlgorithms.SHA256;
+                default:
+                    throw new NotImplementedException(string.Format("Algorithm for digest with '{0}' bytes is not implemented.", hex.Count().ToString()));
+            }
+#pragma warning restore 0618
+        }
+
+        public static string GetHash(object input, string algorithm)
+        {
+            var hashBytes = GetHashBytes(input, algorithm);
+            return hashBytes.ToHexString();
+        }
+
+        public static byte[] GetHashBytes(object input, string algorithm)
+        {
+            if (input == null)
+            {
+                throw new ArgumentNullException(nameof(input));
+            }
+            algorithm = BasicHasherAlgorithms.VerifyAndMapToAlogrithm(algorithm);
+            var preHashBytes = ConvertObjectToPreHashBytes(input);
+#pragma warning disable 0618
+            switch (algorithm)
+            {
+                case BasicHasherAlgorithms.MD5:
+                    return GetMd5HashBytes(preHashBytes);
+                case BasicHasherAlgorithms.SHA1:
+                    return GetSha1HashBytes(preHashBytes);
+                case BasicHasherAlgorithms.SHA256:
+                    return GetSha256HashBytes(preHashBytes);
+                default:
+                    throw new NotImplementedException(string.Format("Algorithm '{0}' is not supported.", algorithm));
+            }
+#pragma warning restore 0618
+        }
+
+        [Obsolete("Use SHA256 instead.")]
         public static string GetMd5Hash(object input)
         {
             var preHashBytes = ConvertObjectToPreHashBytes(input);
@@ -21,20 +122,14 @@ namespace CompliaShield.Sdk.Cryptography.Hashing
             return hashBytes.ToHexString();
         }
 
+        [Obsolete("Use SHA256 instead.")]
         public static byte[] GetMd5HashBytes(object input)
         {
             var preHashBytes = ConvertObjectToPreHashBytes(input);
             return GetMd5HashBytes(preHashBytes);
         }
 
-        private static byte[] GetMd5HashBytes(byte[] input)
-        {
-            using (MD5 md5Hash = MD5.Create())
-            {
-                return md5Hash.ComputeHash(input);
-            }
-        }
-
+        [Obsolete("Use SHA256 instead.")]
         public static string GetSha1Hash(object input)
         {
             var preHashBytes = ConvertObjectToPreHashBytes(input);
@@ -42,6 +137,7 @@ namespace CompliaShield.Sdk.Cryptography.Hashing
             return hashBytes.ToHexString();
         }
 
+        [Obsolete("Use SHA256 instead.")]
         public static byte[] GetSha1HashBytes(object input)
         {
             var preHashBytes = ConvertObjectToPreHashBytes(input);
@@ -61,24 +157,15 @@ namespace CompliaShield.Sdk.Cryptography.Hashing
             return GetSha256HashBytes(preHashBytes);
         }
 
-        public static string GetConcatenatedString(IEnumerable<string> input)
-        {
-
-            if (input == null || !input.Any())
-            {
-                throw new ArgumentException("input");
-            }
-            string stringToHash = "";
-            foreach (var str in input)
-            {
-                stringToHash += str;
-            }
-            return stringToHash;
-        }
-
-
         #region helpers
 
+        private static byte[] GetMd5HashBytes(byte[] input)
+        {
+            using (MD5 md5Hash = MD5.Create())
+            {
+                return md5Hash.ComputeHash(input);
+            }
+        }
 
         private static byte[] GetSha1HashBytes(byte[] input)
         {

@@ -15,6 +15,15 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             var hashed = BasicHasher.GetSha256Hash(toHash);
             Assert.AreEqual(expectedHash, hashed);
 
+            //f1965c91412f0ac9cfd52c6ec54b91ba
+
+            expectedHash = "f1965c91412f0ac9cfd52c6ec54b91ba";
+            hashed = BasicHasher.GetHash(toHash, "MD5");
+            Assert.AreEqual(expectedHash, hashed);
+
+            hashed = BasicHasher.GetMd5Hash(toHash);
+            Assert.AreEqual(expectedHash, hashed);
+
             toHash = "The quick brown fox jumped over the fence.";
             expectedHash = "cae59540cb24e2da1defb0e9b306f25c2e8fa114c265c03854cb75e5ed146b8e";
             hashed = BasicHasher.GetSha256Hash(toHash);

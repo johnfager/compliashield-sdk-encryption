@@ -18,14 +18,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
     using Org.BouncyCastle.Crypto.Parameters;
     using Org.BouncyCastle.Security;
     using Encryption.Keys;
-
-
-    public class RSAKey
-    {
-        public string PublicPEM { get; set; }
-        public string PrivatePEM { get; set; }
-        public string PublicSSH { get; set; }
-    }
+    
 
     [TestClass]
     public class TestEncryption : _baseTest

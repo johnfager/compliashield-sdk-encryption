@@ -164,14 +164,18 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
         public async Task<bool> VerifyAsync(string hex, string signature, CancellationToken token)
         {
             this.EnsureNotDisposed();
-            if (hex == null || !(hex.Length == 32 | hex.Length == 40))
+            if (hex == null || !(hex.Length == 32 | hex.Length == 40 | hex.Length == 64))
             {
-                throw new ArgumentException("hex must be a valid MD5 or SHA1 hash in HEX format");
+                throw new ArgumentException("hex must be a valid MD5, SHA1 or SHA256 hash in HEX format");
             }
             string algorithm = "md5";
             if (hex.Length == 40)
             {
                 algorithm = "sha1";
+            }
+            else if(hex.Length == 64)
+            {
+                algorithm = "sha256";
             }
 
             var verifier = new Signing.Verifier(this.GetPublicRSACryptoServiceProvider());
@@ -183,6 +187,8 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
                     return await Task.FromResult(verifier.VerifyMd5Hash(hex, signature));
                 case "sha1":
                     return await Task.FromResult(verifier.VerifySha1Hash(hex, signature));
+                case "sha256":
+                    return await Task.FromResult(verifier.VerifySha256Hash(hex, signature));
                 default:
                     throw new NotImplementedException(string.Format("algorithm '{0}' is not implemented.", algorithm));
             }

@@ -3,19 +3,11 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
-    using System.IO;
-    using System.Security.Cryptography.X509Certificates;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
-    using System.Management;
-    using System.Reflection;
-    using System.Security.Cryptography;
-    using CompliaShield.Sdk.Cryptography.Extensions;
-    using Utilities;
-    using Encryption;
-    using Encryption.Keys;
-    using Hashing;
+    using CompliaShield.Sdk.Cryptography.Encryption.Keys;
+    using CompliaShield.Sdk.Cryptography.Hashing;
+    using CompliaShield.Sdk.Cryptography.Utilities;
+    using Extensions;
 
     [TestClass]
     public class TestSigning : _baseTest
@@ -37,45 +29,97 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             var cert2 = LoadCertificate();
             var key = new X509Certificate2KeyEncryptionKey(cert2);
             var guid = new Guid();
-            var bytesToMd5Hash = Serializer.SerializeToByteArray(guid);
-            
-            var res = key.SignAsync(bytesToMd5Hash, "MD5").GetAwaiter().GetResult();
-            Assert.IsNotNull(res.Item1);
-            Assert.IsNotNull(res.Item2);
+            var bytesToHash = Serializer.SerializeToByteArray(guid);
 
-            var isValid = key.VerifyAsync(bytesToMd5Hash, res.Item1, "MD5").GetAwaiter().GetResult();
-            Assert.IsTrue(isValid);
+            //var algorithms = new string[] { "MD5", "SHA1", "SHA256" };
+            foreach (var algorithm in BasicHasherAlgorithms.AllAlgorithms)
+            {
+                byte[] thisCopy = new byte[bytesToHash.Count()];
+                bytesToHash.CopyTo(thisCopy, 0);
+                Assert.IsTrue(bytesToHash.SequenceEqual(thisCopy));
 
-            var isValid2 = key.VerifyAsync(bytesToMd5Hash, res.Item2, "MD5").GetAwaiter().GetResult();
-            Assert.IsTrue(isValid2);
+                var hashBytes = BasicHasher.GetHashBytes(bytesToHash, algorithm);
 
-            var md5HashHex = BasicHasher.GetMd5Hash(bytesToMd5Hash); //ChecksumHash.GetMD5Hash(bytesToMd5Hash);
-            var isValidHex = key.VerifyAsync(md5HashHex, res.Item2).GetAwaiter().GetResult();
-            Assert.IsTrue(isValidHex);
+                var hashAsHex1 = hashBytes.ToHexString();
+                Console.WriteLine("Hash is: " + hashAsHex1);
 
-            var signedHex = key.SignAsync(md5HashHex).GetAwaiter().GetResult();
-            isValidHex = key.VerifyAsync(md5HashHex, signedHex.Item2).GetAwaiter().GetResult();
-            Assert.IsTrue(isValidHex);
+                var res = key.SignAsync(hashBytes, algorithm).GetAwaiter().GetResult();
+                Assert.IsNotNull(res.Item1);
+                Assert.IsNotNull(res.Item2);
 
-            // sha1
+                //var item2AsByte = Format.HexStringToByteArray(res.Item2);
+                //Assert.IsTrue(item2AsByte.SequenceEqual(res.Item1));
 
-            res = key.SignAsync(bytesToMd5Hash, "SHA1").GetAwaiter().GetResult();
-            Assert.IsNotNull(res.Item1);
-            Assert.IsNotNull(res.Item2);
+                //// check digest
+                //var digest2 = BasicHasher.GetHashBytes(bytesToHash, algorithm);
+                //Assert.IsTrue(digest2.SequenceEqual(hashBytes));
 
-            isValid = key.VerifyAsync(bytesToMd5Hash, res.Item1, "SHA1").GetAwaiter().GetResult();
-            Assert.IsTrue(isValid);
+                var isValid = key.VerifyAsync(hashBytes, res.Item1, algorithm).GetAwaiter().GetResult();
+                Assert.IsTrue(isValid);
 
-            isValid2 = key.VerifyAsync(bytesToMd5Hash, res.Item2, "SHA1").GetAwaiter().GetResult();
-            Assert.IsTrue(isValid2);
 
-            var sha1HashHex = BasicHasher.GetSha1Hash(bytesToMd5Hash);
-            isValidHex = key.VerifyAsync(sha1HashHex, res.Item2).GetAwaiter().GetResult();
-            Assert.IsTrue(isValidHex);
+                //var isValid2 = key.VerifyAsync(hashBytes, res.Item2, algorithm).GetAwaiter().GetResult();
+                //Assert.IsTrue(isValid2);
 
-            var sha1HexSigned = key.SignAsync(sha1HashHex).GetAwaiter().GetResult();
-            isValidHex = key.VerifyAsync(sha1HashHex, sha1HexSigned.Item2).GetAwaiter().GetResult();
-            Assert.IsTrue(isValidHex);
+                //Assert.IsTrue(bytesToHash.SequenceEqual(thisCopy));
+
+                var hashHex = BasicHasher.GetHash(bytesToHash, algorithm);
+                Console.WriteLine("Hash is now: " + hashHex);
+
+                var asBytes = Format.HexStringToByteArray(hashHex);
+
+                Assert.IsTrue(asBytes.SequenceEqual(hashBytes));
+
+                
+                var isValidHex = key.VerifyAsync(hashHex, res.Item2).GetAwaiter().GetResult();
+                Assert.IsTrue(isValidHex);
+
+                var hexSigned = key.SignAsync(hashHex).GetAwaiter().GetResult();
+                isValidHex = key.VerifyAsync(hashHex, hexSigned.Item2).GetAwaiter().GetResult();
+                Assert.IsTrue(isValidHex);
+
+                Console.WriteLine(algorithm + " passed");
+
+            }
+
+
+            //var res = key.SignAsync(bytesToHash, "MD5").GetAwaiter().GetResult();
+            //Assert.IsNotNull(res.Item1);
+            //Assert.IsNotNull(res.Item2);
+
+            //var isValid = key.VerifyAsync(bytesToHash, res.Item1, "MD5").GetAwaiter().GetResult();
+            //Assert.IsTrue(isValid);
+
+            //var isValid2 = key.VerifyAsync(bytesToHash, res.Item2, "MD5").GetAwaiter().GetResult();
+            //Assert.IsTrue(isValid2);
+
+            //var md5HashHex = BasicHasher.GetMd5Hash(bytesToHash); //ChecksumHash.GetMD5Hash(bytesToMd5Hash);
+            //var isValidHex = key.VerifyAsync(md5HashHex, res.Item2).GetAwaiter().GetResult();
+            //Assert.IsTrue(isValidHex);
+
+            //var signedHex = key.SignAsync(md5HashHex).GetAwaiter().GetResult();
+            //isValidHex = key.VerifyAsync(md5HashHex, signedHex.Item2).GetAwaiter().GetResult();
+            //Assert.IsTrue(isValidHex);
+
+            //// sha1
+
+            //res = key.SignAsync(bytesToHash, "SHA1").GetAwaiter().GetResult();
+            //Assert.IsNotNull(res.Item1);
+            //Assert.IsNotNull(res.Item2);
+
+            //isValid = key.VerifyAsync(bytesToHash, res.Item1, "SHA1").GetAwaiter().GetResult();
+            //Assert.IsTrue(isValid);
+
+            //isValid2 = key.VerifyAsync(bytesToHash, res.Item2, "SHA1").GetAwaiter().GetResult();
+            //Assert.IsTrue(isValid2);
+
+            //var sha1HashHex = BasicHasher.GetSha1Hash(bytesToHash);
+            //isValidHex = key.VerifyAsync(sha1HashHex, res.Item2).GetAwaiter().GetResult();
+            //Assert.IsTrue(isValidHex);
+
+            //var sha1HexSigned = key.SignAsync(sha1HashHex).GetAwaiter().GetResult();
+            //isValidHex = key.VerifyAsync(sha1HashHex, sha1HexSigned.Item2).GetAwaiter().GetResult();
+            //Assert.IsTrue(isValidHex);
 
         }
     }
