@@ -28,5 +28,28 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
                            .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
                            .ToArray();
         }
+
+        public static bool TryParseBase64Encoded(string input, out byte[] value)
+        {
+            try
+            {
+                // If no exception is caught, then it is possibly a base64 encoded string
+                value = Convert.FromBase64String(input);
+                return (input.Replace(" ", "").Length % 4 == 0);
+            }
+            catch
+            {
+                // If exception is caught, then it is not a base64 encoded string
+                value = null;
+                return false;
+            }
+        }
+
+        private static readonly Regex r = new Regex(@"^[0-9A-Fa-f\r\n]+$");
+
+        public static bool VerifyHex(string hex)
+        {
+            return r.Match(hex).Success;
+        }
     }
 }

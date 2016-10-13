@@ -15,10 +15,13 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
     {
 
         private RSACryptoServiceProvider _privateKey;
-        //private EncodingOption _encoding;
+
+        private EncodingOption _encoding;
+
+        public EncodingOption Encoding { get { return _encoding; } }
 
         /// <summary>
-        /// Initializes the signer to output a base64 encoded string
+        /// Initializes the signer to output signed bytes and a Base64 string.
         /// </summary>
         /// <param name="privateKey"></param>
         public Signer(RSACryptoServiceProvider privateKey)
@@ -28,18 +31,24 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
                 throw new ArgumentException("privateKey");
             }
             _privateKey = privateKey;
-            //_encoding = EncodingOption.Base64String;
+            // hex strings are shorter and the verifier will accept either
+            _encoding = EncodingOption.Base64String;
         }
 
-        //public Signer(RSACryptoServiceProvider privateKey, EncodingOption output)
-        //{
-        //    if (privateKey == null)
-        //    {
-        //        throw new ArgumentException("privateKey");
-        //    }
-        //    _privateKey = privateKey;
-        //    _encoding = output;
-        //}
+        /// <summary>
+        /// Initializes the signer to output signed bytes and a string based on the requested options.
+        /// </summary>
+        /// <param name="privateKey"></param>
+        /// <param name="output"></param>
+        public Signer(RSACryptoServiceProvider privateKey, EncodingOption output)
+        {
+            if (privateKey == null)
+            {
+                throw new ArgumentException("privateKey");
+            }
+            _privateKey = privateKey;
+            _encoding = output;
+        }
 
         public Tuple<byte[], string> SignHash(string hex, string algorithm)
         {
@@ -82,25 +91,21 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
             }
             
             string res2;
-
-            //if (_encoding == EncodingOption.Base64String)
-            //{
-            //    res2 = Convert.ToBase64String(signedHash);
-            //}
-            //else if (_encoding == EncodingOption.HexString)
-            //{
-            //    res2 = signedHash.ToHexString();
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException(_encoding.ToString());
-            //}
-            res2 = signedHash.ToHexString();
-
+            if (_encoding == EncodingOption.Base64String)
+            {
+                res2 = Convert.ToBase64String(signedHash);
+            }
+            else if (_encoding == EncodingOption.HexString)
+            {
+                res2 = signedHash.ToHexString();
+            }
+            else
+            {
+                throw new NotImplementedException(_encoding.ToString());
+            }            
 #if DEBUG
             Console.WriteLine("Signed\t" + hashHex + "\t" + algorithm + "\tresult\t" + res2);
 #endif
-
             return new Tuple<byte[], string>(signedHash, res2);
         }
 
@@ -133,19 +138,19 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
                 }
             }
 
-            //if (_encoding == EncodingOption.Base64String)
-            //{
-            //    return Convert.ToBase64String(signedHash);
-            //}
-            //else if (_encoding == EncodingOption.HexString)
-            //{
-            //    return signedHash.ToHexString();
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException(_encoding.ToString());
-            //}
-            return signedHash.ToHexString();
+            if (_encoding == EncodingOption.Base64String)
+            {
+                return Convert.ToBase64String(signedHash);
+            }
+            else if (_encoding == EncodingOption.HexString)
+            {
+                return signedHash.ToHexString();
+            }
+            else
+            {
+                throw new NotImplementedException(_encoding.ToString());
+            }
+            //return signedHash.ToHexString();
         }
 
         [Obsolete("Use SHA256 instead.")]
@@ -153,19 +158,19 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
         {
             var cryptoconfig = CryptoConfig.MapNameToOID("MD5");
             var signedHash = _privateKey.SignHash(hashedBytes, cryptoconfig);
-            //if (_encoding == EncodingOption.Base64String)
-            //{
-            //    return new Tuple<byte[], string>(signedHash, Convert.ToBase64String(signedHash));
-            //}
-            //else if (_encoding == EncodingOption.HexString)
-            //{
-            //    return new Tuple<byte[], string>(signedHash, signedHash.ToHexString());
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException(_encoding.ToString());
-            //}
-            return new Tuple<byte[], string>(signedHash, signedHash.ToHexString());
+            if (_encoding == EncodingOption.Base64String)
+            {
+                return new Tuple<byte[], string>(signedHash, Convert.ToBase64String(signedHash));
+            }
+            else if (_encoding == EncodingOption.HexString)
+            {
+                return new Tuple<byte[], string>(signedHash, signedHash.ToHexString());
+            }
+            else
+            {
+                throw new NotImplementedException(_encoding.ToString());
+            }
+            //return new Tuple<byte[], string>(signedHash, signedHash.ToHexString());
         }
 
         #endregion
@@ -183,38 +188,38 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
         public string SignSha1Hash(byte[] hashedBytes)
         {
             var signedHash = _privateKey.SignHash(hashedBytes, CryptoConfig.MapNameToOID("SHA1"));
-            //if (_encoding == EncodingOption.Base64String)
-            //{
-            //    return Convert.ToBase64String(signedHash);
-            //}
-            //else if (_encoding == EncodingOption.HexString)
-            //{
-            //    return signedHash.ToHexString();
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException(_encoding.ToString());
-            //}
-            return signedHash.ToHexString();
+            if (_encoding == EncodingOption.Base64String)
+            {
+                return Convert.ToBase64String(signedHash);
+            }
+            else if (_encoding == EncodingOption.HexString)
+            {
+                return signedHash.ToHexString();
+            }
+            else
+            {
+                throw new NotImplementedException(_encoding.ToString());
+            }
+            //return signedHash.ToHexString();
         }
 
         [Obsolete("Use SHA256 instead.")]
         public Tuple<byte[], string> SignSha1(byte[] hashedBytes)
         {
             var signedHash = _privateKey.SignHash(hashedBytes, CryptoConfig.MapNameToOID("SHA1"));
-            //if (_encoding == EncodingOption.Base64String)
-            //{
-            //    return new Tuple<byte[], string>(signedHash, Convert.ToBase64String(signedHash));
-            //}
-            //else if (_encoding == EncodingOption.HexString)
-            //{
-            //    return new Tuple<byte[], string>(signedHash, signedHash.ToHexString());
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException(_encoding.ToString());
-            //}
-            return new Tuple<byte[], string>(signedHash, signedHash.ToHexString());
+            if (_encoding == EncodingOption.Base64String)
+            {
+                return new Tuple<byte[], string>(signedHash, Convert.ToBase64String(signedHash));
+            }
+            else if (_encoding == EncodingOption.HexString)
+            {
+                return new Tuple<byte[], string>(signedHash, signedHash.ToHexString());
+            }
+            else
+            {
+                throw new NotImplementedException(_encoding.ToString());
+            }
+            //return new Tuple<byte[], string>(signedHash, signedHash.ToHexString());
         }
 
         #endregion
@@ -231,37 +236,37 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
         public string SignSha256Hash(byte[] hashedBytes)
         {
             var signedHash = _privateKey.SignHash(hashedBytes, CryptoConfig.MapNameToOID("SHA256"));
-            //if (_encoding == EncodingOption.Base64String)
-            //{
-            //    return Convert.ToBase64String(signedHash);
-            //}
-            //else if (_encoding == EncodingOption.HexString)
-            //{
-            //    return signedHash.ToHexString();
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException(_encoding.ToString());
-            //}
-            return signedHash.ToHexString();
+            if (_encoding == EncodingOption.Base64String)
+            {
+                return Convert.ToBase64String(signedHash);
+            }
+            else if (_encoding == EncodingOption.HexString)
+            {
+                return signedHash.ToHexString();
+            }
+            else
+            {
+                throw new NotImplementedException(_encoding.ToString());
+            }
+            //return signedHash.ToHexString();
         }
 
         public Tuple<byte[], string> SignSha256(byte[] hashedBytes)
         {
             var signedHash = _privateKey.SignHash(hashedBytes, CryptoConfig.MapNameToOID("SHA256"));
-            //if (_encoding == EncodingOption.Base64String)
-            //{
-            //    return new Tuple<byte[], string>(signedHash, Convert.ToBase64String(signedHash));
-            //}
-            //else if (_encoding == EncodingOption.HexString)
-            //{
-            //    return new Tuple<byte[], string>(signedHash, signedHash.ToHexString());
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException(_encoding.ToString());
-            //}
-            return new Tuple<byte[], string>(signedHash, signedHash.ToHexString());
+            if (_encoding == EncodingOption.Base64String)
+            {
+                return new Tuple<byte[], string>(signedHash, Convert.ToBase64String(signedHash));
+            }
+            else if (_encoding == EncodingOption.HexString)
+            {
+                return new Tuple<byte[], string>(signedHash, signedHash.ToHexString());
+            }
+            else
+            {
+                throw new NotImplementedException(_encoding.ToString());
+            }
+            //return new Tuple<byte[], string>(signedHash, signedHash.ToHexString());
         }
 
 

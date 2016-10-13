@@ -9,6 +9,7 @@ namespace CompliaShield.Sdk.Cryptography.Extensions
 
     public static class StringExtensions
     {
+        [Obsolete("Use System.Convert instead.")]
         public static byte[] HexStringToByteArray(this string hex)
         {
 

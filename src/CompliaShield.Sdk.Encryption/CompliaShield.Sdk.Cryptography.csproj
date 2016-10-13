@@ -57,12 +57,14 @@
     <Compile Include="Encryption\Keys\ProtectedX509Certificate2.cs" />
     <Compile Include="Encryption\Keys\IProtectedKey.cs" />
     <Compile Include="Encryption\Keys\IPublicKey.cs" />
+    <Compile Include="Encryption\Keys\RSACryptoServiceProviderPublicKey.cs" />
     <Compile Include="Encryption\Keys\X509CertificatePublicKey.cs" />
     <Compile Include="Encryption\SerializationHelpers\DictionaryOfStringConverter.cs" />
     <Compile Include="Encryption\SerializationHelpers\KeyValuePairOfString.cs" />
     <Compile Include="Encryption\SerializationHelpers\StringDictionaryCaseInsensitive.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Hashing\BasicHasherAlgorithms.cs" />
+    <Compile Include="Utilities\RSACryptoServiceProviderHelper.cs" />
     <Compile Include="Utilities\StringWriterWithEncoding.cs" />
     <Compile Include="X509Certificates\CertificatePolicy.cs" />
     <Compile Include="X509Certificates\ICertificatePolicy.cs" />

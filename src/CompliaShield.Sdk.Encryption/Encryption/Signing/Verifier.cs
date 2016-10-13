@@ -10,6 +10,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
     using Extensions;
     using Utilities;
     using Hashing;
+    using Keys;
 
     public class Verifier
     {
@@ -18,7 +19,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
 
         public Verifier(RSACryptoServiceProvider publicKey)
         {
-            this.Initialize(publicKey, EncodingOption.Base64String);
+            this.Initialize(publicKey);
         }
 
         //public Verifier(RSACryptoServiceProvider publicKey, EncodingOption encoding)
@@ -26,7 +27,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
         //    this.Initialize(publicKey, encoding);
         //}
 
-        private void Initialize(RSACryptoServiceProvider publicKey, EncodingOption encoding)
+        private void Initialize(RSACryptoServiceProvider publicKey)
         {
             if (publicKey == null)
             {
@@ -40,20 +41,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
 
         public bool VerifyHash(string hashHex, string signedHash, string algorithm)
         {
-            byte[] signedBytes;
-            //if (_encoding == EncodingOption.Base64String)
-            //{
-            //    signedBytes = Convert.FromBase64String(signedHash);
-            //}
-            //else if (_encoding == EncodingOption.HexString)
-            //{
-            //    signedBytes = Format.HexStringToByteArray(signedHash);
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException(_encoding.ToString());
-            //}
-            signedBytes = Format.HexStringToByteArray(signedHash);
+            byte[] signedBytes = BasicHasher.ConvertFromHexOrBase64(signedHash);          
             return this.VerifyHash(hashHex, signedBytes, algorithm);
         }
 
@@ -83,20 +71,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
             algorithm = BasicHasherAlgorithms.VerifyAndMapToAlogrithm(algorithm);
             BasicHasher.ValidateDigestLength(algorithm, hashedBytes);
 
-            byte[] signedBytes;
-            //if (_encoding == EncodingOption.Base64String)
-            //{
-            //    signedBytes = Convert.FromBase64String(signedHash);
-            //}
-            //else if (_encoding == EncodingOption.HexString)
-            //{
-            //    signedBytes = Format.HexStringToByteArray(signedHash);
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException(_encoding.ToString());
-            //}
-            signedBytes = Format.HexStringToByteArray(signedHash);
+            byte[] signedBytes = BasicHasher.ConvertFromHexOrBase64(signedHash);
             var isValid = _publicKey.VerifyHash(hashedBytes, algorithm, signedBytes);
 #if DEBUG
             var hashHex = hashedBytes.ToHexString();
@@ -106,26 +81,11 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
         }
 
 
-
-
         #region MD5
 
         public bool VerifyMd5Hash(string hashHex, string signedHash)
         {
-            byte[] signedBytes;
-            //if (_encoding == EncodingOption.Base64String)
-            //{
-            //    signedBytes = Convert.FromBase64String(signedHash);
-            //}
-            //else if (_encoding == EncodingOption.HexString)
-            //{
-            //    signedBytes = Format.HexStringToByteArray(signedHash);
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException(_encoding.ToString());
-            //}
-            signedBytes = Format.HexStringToByteArray(signedHash);
+            byte[] signedBytes = BasicHasher.ConvertFromHexOrBase64(signedHash);
             return this.VerifyMd5Hash(hashHex, signedBytes);
         }
 
@@ -147,20 +107,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
 
         public bool VerifySha1Hash(string hashHex, string signedHash)
         {
-            byte[] signedBytes;
-            //if (_encoding == EncodingOption.Base64String)
-            //{
-            //    signedBytes = Convert.FromBase64String(signedHash);
-            //}
-            //else if (_encoding == EncodingOption.HexString)
-            //{
-            //    signedBytes = Format.HexStringToByteArray(signedHash);
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException(_encoding.ToString());
-            //}
-            signedBytes = Format.HexStringToByteArray(signedHash);
+            byte[] signedBytes = BasicHasher.ConvertFromHexOrBase64(signedHash);
             return this.VerifySha1Hash(hashHex, signedBytes);
         }
 
@@ -183,20 +130,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
 
         public bool VerifySha256Hash(string hashHex, string signedHash)
         {
-            byte[] signedBytes;
-            //if (_encoding == EncodingOption.Base64String)
-            //{
-            //    signedBytes = Convert.FromBase64String(signedHash);
-            //}
-            //else if (_encoding == EncodingOption.HexString)
-            //{
-            //    signedBytes = Format.HexStringToByteArray(signedHash);
-            //}
-            //else
-            //{
-            //    throw new NotImplementedException(_encoding.ToString());
-            //}
-            signedBytes = Format.HexStringToByteArray(signedHash);
+            byte[] signedBytes = BasicHasher.ConvertFromHexOrBase64(signedHash);
             return this.VerifySha256Hash(hashHex, signedBytes);
         }
 

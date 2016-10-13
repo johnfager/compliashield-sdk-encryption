@@ -30,9 +30,9 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 
         Task<bool> VerifyAsync(byte[] digest, string signature, string algorithm, CancellationToken token);
 
-        Task<bool> VerifyAsync(string hex, string signature);
+        Task<bool> VerifyAsync(string digest, string signature);
 
-        Task<bool> VerifyAsync(string hex, string signature, CancellationToken token);
+        Task<bool> VerifyAsync(string digest, string signature, CancellationToken token);
 
         Task<byte[]> WrapKeyAsync(byte[] key);
 

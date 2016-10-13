@@ -13,6 +13,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
     using System.Security.Cryptography;
     using Utilities;
     using Encryption;
+    using System.Security;
 
     public abstract class _baseTest
     {
@@ -20,6 +21,41 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         protected const string CERT_FOLDER = @"cert\";
 
         #region helpers
+
+        public X509Certificate2 GetCertificateByThumbprint(StoreLocation storeLocation, string thumbprint)
+        {
+            X509Store certStore = new X509Store(StoreName.My, storeLocation);
+            try
+            {
+                try
+                {
+                    certStore.Open(OpenFlags.ReadOnly);
+                }
+                catch (Exception ex)
+                {
+                    var outerEx = new SecurityException(string.Format("Failed to open X509Store in '{0}'.", storeLocation.ToString()), ex);
+                    throw outerEx;
+                }
+                
+
+                foreach(var thisCert in certStore.Certificates)
+                {
+                    Console.WriteLine(thisCert.Thumbprint + "\t" + thisCert.Subject);
+                }
+
+                var certCollection = certStore.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
+                if (certCollection == null || certCollection.Count == 0)
+                {
+                    throw new ArgumentException(string.Format("thumbprint '{0}' does not match any certificates in '{1}'.", thumbprint, storeLocation.ToString()));
+                }
+                var cert = certCollection[0];
+                return cert;
+            }
+            finally
+            {
+                certStore.Close();
+            }
+        }
 
         protected void CheckLineLengthDifferences(FileInfo fiTempEncrypted, StringBuilder stb)
         {

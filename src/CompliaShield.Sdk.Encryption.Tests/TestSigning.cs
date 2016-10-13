@@ -8,6 +8,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
     using CompliaShield.Sdk.Cryptography.Hashing;
     using CompliaShield.Sdk.Cryptography.Utilities;
     using Extensions;
+    using Encryption.Signing;
 
     [TestClass]
     public class TestSigning : _baseTest
@@ -17,10 +18,28 @@ namespace CompliaShield.Sdk.Cryptography.Tests
         public void TestLength()
         {
             var hex = "f87104a9953455f7a75133208c65f0e1";
-
             Assert.IsFalse(hex == null || !(hex.Length == 32 | hex.Length == 40));
+        }
+
+        [TestMethod]
+        public void TestVerify()
+        {
+            var keyId = "ce35fffdc2665abe89c249fe4da72685c63c0932";
+            var cert = this.GetCertificateByThumbprint(System.Security.Cryptography.X509Certificates.StoreLocation.CurrentUser, keyId);
+
+            var pubKey = new X509CertificatePublicKey(cert);
+
+            var MD5 = "f7bf9ac463972ea44000f06b939b3187";
+
+            var signedHash = @"IRXGatFB2X+Knl52Z2fhGvD77MZA2TfwhOqeifzWHLNBz1r6tojZzRZsGZSIoLRC7Zl/GlsIIgV7gmLSb739nKb5WVMf8cWOwPoK048MgOh+jWfgYmXWnBCbjiaDRvwtCYFrBNRWIWdCDDzZY9QpGYWSP43z2ke1BlVfvx31vq1fAoUthcpSBPeQxPrnqS7kvEeJDJ5elBKZKFlq6IMnGz2j0Msn1vhtspxqDTtQnuu+Vg0mYtuglOjLorJQ/4XDI+YtNnYPEK6YuZUbQmm5OvVvMFqWrnOR+XUwxut0Hi4rhwBhcNartvyVfj/iPP9cX5Jqw3IJtOyjcoRRz6gpBQ==";
+
+
+            pubKey.VerifyAsync(MD5, signedHash).GetAwaiter().GetResult();
+
+
 
         }
+
 
 
         [TestMethod]
@@ -47,6 +66,11 @@ namespace CompliaShield.Sdk.Cryptography.Tests
                 Assert.IsNotNull(res.Item1);
                 Assert.IsNotNull(res.Item2);
 
+                var hex = res.Item1.ToHexString();
+                Console.WriteLine("hex len\t" + hex.Length.ToString());
+                var b64 = Convert.ToBase64String(res.Item1);
+                Console.WriteLine("b64 len\t" + b64.Length.ToString());
+
                 //var item2AsByte = Format.HexStringToByteArray(res.Item2);
                 //Assert.IsTrue(item2AsByte.SequenceEqual(res.Item1));
 
@@ -70,7 +94,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
                 Assert.IsTrue(asBytes.SequenceEqual(hashBytes));
 
-                
+
                 var isValidHex = key.VerifyAsync(hashHex, res.Item2).GetAwaiter().GetResult();
                 Assert.IsTrue(isValidHex);
 

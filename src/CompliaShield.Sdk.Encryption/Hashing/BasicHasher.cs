@@ -157,6 +157,36 @@ namespace CompliaShield.Sdk.Cryptography.Hashing
             return GetSha256HashBytes(preHashBytes);
         }
 
+        /// <summary>
+        /// Autodetects whether the input is a HEX encoded or Base64 string and returns bytes.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static byte[] ConvertFromHexOrBase64(string input)
+        {
+            byte[] bytes;
+            try
+            {
+                if (Format.VerifyHex(input))
+                {
+                    bytes = Format.HexStringToByteArray(input);
+                }
+                else if(Format.TryParseBase64Encoded(input, out bytes))
+                {
+                    return bytes;
+                }
+            }
+            catch (FormatException ex)
+            {
+                var exMsg = string.Format("input '{0}' is not a valid hex or base64 string.", input);
+#if DEBUG
+                Console.WriteLine(exMsg);
+#endif
+                throw new FormatException(exMsg, ex);
+            }
+            return bytes;
+        }
+
         #region helpers
 
         private static byte[] GetMd5HashBytes(byte[] input)
