@@ -8,7 +8,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 
     public interface IPublicKey : IDisposable
     {
-        string KeyLocator { get; }
+        string KeyLocator { get; set; }
 
         string Actor { get; set; }
 
