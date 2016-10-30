@@ -14,6 +14,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
     {
         Undefined = 0,
         Legacy_Aes2 = 1,
+        Aes256_200000 = 20,
         Aes256_1000 = 100,
         //Aes256_100 = 140,
         Aes256_5 = 150

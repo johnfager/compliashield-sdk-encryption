@@ -205,6 +205,57 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
 
         #endregion
 
+
+        #region AES20000
+
+        /// <summary>
+        /// AES 256 with 20000 iterations.
+        /// </summary>
+        /// <param name="plainText"></param>
+        /// <param name="passPhrase"></param>
+        /// <returns></returns>
+        public static string Encrypt20000(string plainText, SecureString passPhrase)
+        {
+            return Encrypt_Private_v1(plainText, passPhrase, 20000, false);
+        }
+
+        /// <summary>
+        /// AES 256 with 20000 iterations.
+        /// </summary>
+        /// <param name="plainText"></param>
+        /// <param name="passPhrase"></param>
+        /// <param name="useBase36">True returns a base36 encoding set to lowercase for legibility.</param>
+        /// <returns></returns>
+        public static string Encrypt20000(string plainText, SecureString passPhrase, bool useBase36)
+        {
+            return Encrypt_Private_v1(plainText, passPhrase, 20000, useBase36);
+        }
+
+        /// <summary>
+        /// AES 256 with 20000 iterations.
+        /// </summary>
+        /// <param name="unencryptedBytes"></param>
+        /// <param name="passPhraseAsBytes"></param>
+        /// <returns></returns>
+        public static byte[] Encrypt20000(byte[] unencryptedBytes, byte[] passPhraseAsBytes)
+        {
+            return Encrypt_Private_v1(unencryptedBytes, passPhraseAsBytes, 20000);
+        }
+
+
+        /// <summary>
+        /// AES 256 with 20000 iterations.
+        /// </summary>
+        /// <param name="unencryptedBytes"></param>
+        /// <param name="passPhrase"></param>
+        /// <returns></returns>
+        public static byte[] Encrypt20000(byte[] unencryptedBytes, SecureString passPhrase)
+        {
+            return Encrypt_Private_v1(unencryptedBytes, passPhrase, 20000);
+        }
+
+        #endregion
+
         #region helpers
 
         private static string Encrypt_Private_v1(string plainText, SecureString passPhrase, int iterations, bool useBase36)
@@ -254,6 +305,10 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
                     break;
                 case 1000:
                     iterationSetting = (byte)10;
+                    saltLength = 32;
+                    break;
+                case 20000:
+                    iterationSetting = (byte)20;
                     saltLength = 32;
                     break;
                 default:
@@ -405,6 +460,10 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
                     break;
                 case 10:
                     iterations = 1000;
+                    saltByteCount = 32;
+                    break;
+                case 20:
+                    iterations = 20000;
                     saltByteCount = 32;
                     break;
                 default:

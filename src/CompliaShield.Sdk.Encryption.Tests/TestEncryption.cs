@@ -20,6 +20,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
     using Encryption.Keys;
     using System.Security;
     using Extensions;
+    using System.Diagnostics;
 
     [TestClass]
     public class TestEncryption : _baseTest
@@ -92,7 +93,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
             var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
 
-            var encryptor = new AsymmetricEncryptor() { AsymmetricStrategy = AsymmetricStrategyOption.Aes256_1000 };
+            var encryptor = new AsymmetricEncryptor() { AsymmetricStrategy = AsymmetricStrategyOption.Aes256_200000 };
 
             var asymEncObj = encryptor.EncryptObjectAsync(stringToEncrypt, publicKey).GetAwaiter().GetResult();
             asymEncObj.PublicMetadata = new Dictionary<string, string>();
@@ -217,6 +218,78 @@ namespace CompliaShield.Sdk.Cryptography.Tests
                 }
             }
         }
+
+        [TestMethod]
+        public void TestAes20000()
+        {
+            int length = 100;
+            var rand = new RandomGenerator();
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            for (int i = 0; i < length; i++)
+            {
+                using (var password = rand.RandomSecureStringPassword(10, 50))
+                {
+                    var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
+                    // base 64
+                    var encryptedBase64 = AesEncryptor.Encrypt20000(stringToEncrypt, password);
+                    var decryptedBase64 = AesEncryptor.Decrypt(encryptedBase64, password);
+                    Assert.AreEqual(stringToEncrypt, decryptedBase64);
+                    // base 36
+                    var encryptedBase36 = AesEncryptor.Encrypt20000(stringToEncrypt, password, true);
+                    var decryptedBase36 = AesEncryptor.Decrypt(encryptedBase36, password, true);
+                    Assert.AreEqual(stringToEncrypt, decryptedBase36);
+
+                    Console.WriteLine(string.Format("{0:N0}\t{1}", i, stopwatch.Elapsed));
+                    stopwatch.Stop();
+                    stopwatch.Reset();
+                    stopwatch.Start();
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestAes20000_Bytes()
+        {
+            int length = 100;
+            var rand = new RandomGenerator();
+
+            //byte[] entropy = new byte[20];
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            for (int i = 0; i < length; i++)
+            {
+
+                byte[] newKey = new byte[rand.RandomNumber(75, 88)];
+                using (var rng = new RNGCryptoServiceProvider())
+                {
+                    //rng.GetBytes(entropy);
+                    rng.GetBytes(newKey);
+                }
+
+                var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
+
+                var bytes = System.Text.Encoding.UTF8.GetBytes(stringToEncrypt);
+
+                // base 64
+                var encryptedBytes = AesEncryptor.Encrypt20000(bytes, newKey);
+                var decryptedBytes = AesEncryptor.Decrypt(encryptedBytes, newKey);
+
+                Assert.IsTrue(decryptedBytes.SequenceEqual(bytes));
+
+                var decryptedString = System.Text.Encoding.UTF8.GetString(decryptedBytes);
+                Assert.AreEqual(stringToEncrypt, decryptedString);
+
+                Console.WriteLine(string.Format("{0:N0}\t{1}", i, stopwatch.Elapsed));
+                stopwatch.Stop();
+                stopwatch.Reset();
+                stopwatch.Start();
+            }
+        }
+
+
 
         [TestMethod]
         public void TestAes1000()
