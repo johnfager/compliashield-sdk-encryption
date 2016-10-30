@@ -42,8 +42,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
         {
             return Decrypt_Private(encryptedString, passwordBytes, useBase36);
         }
-
-
+        
         public static byte[] Decrypt(byte[] encryptionPayload, SecureString passPhrase)
         {
             var passwordBytes = passPhrase.ToByteArray();
@@ -92,6 +91,18 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             return Encrypt_Private_v1(unencryptedBytes, passPhraseAsBytes, 5);
         }
 
+
+        /// <summary>
+        /// AES 256 with 5 iterations.
+        /// </summary>
+        /// <param name="unencryptedBytes"></param>
+        /// <param name="passPhrase"></param>
+        /// <returns></returns>
+        public static byte[] Encrypt5(byte[] unencryptedBytes, SecureString passPhrase)
+        {
+            return Encrypt_Private_v1(unencryptedBytes, passPhrase, 5);
+        }
+
         #endregion
 
 
@@ -129,6 +140,17 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
         public static byte[] Encrypt200(byte[] unencryptedBytes, byte[] passPhraseAsBytes)
         {
             return Encrypt_Private_v1(unencryptedBytes, passPhraseAsBytes, 200);
+        }
+
+        /// <summary>
+        /// AES 256 with 200 iterations.
+        /// </summary>
+        /// <param name="unencryptedBytes"></param>
+        /// <param name="passPhrase"></param>
+        /// <returns></returns>
+        public static byte[] Encrypt200(byte[] unencryptedBytes,SecureString passPhrase)
+        {
+            return Encrypt_Private_v1(unencryptedBytes, passPhrase, 200);
         }
 
         #endregion
@@ -169,6 +191,18 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             return Encrypt_Private_v1(unencryptedBytes, passPhraseAsBytes, 1000);
         }
 
+
+        /// <summary>
+        /// AES 256 with 1000 iterations.
+        /// </summary>
+        /// <param name="unencryptedBytes"></param>
+        /// <param name="passPhrase"></param>
+        /// <returns></returns>
+        public static byte[] Encrypt1000(byte[] unencryptedBytes, SecureString passPhrase)
+        {
+            return Encrypt_Private_v1(unencryptedBytes, passPhrase, 1000);
+        }
+
         #endregion
 
         #region helpers
@@ -195,9 +229,16 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             return cipherText;
         }
 
+        private static byte[] Encrypt_Private_v1(byte[] unencryptedBytes, SecureString passPhrase, int iterations)
+        {
+            var passPhraseAsBytes = passPhrase.ToByteArray();
+            var payload = Encrypt_Private_v1(unencryptedBytes, passPhraseAsBytes, iterations);
+            passPhraseAsBytes.ClearByteArray(); // modify the byte array
+            return payload;
+        }
+
         private static byte[] Encrypt_Private_v1(byte[] unencryptedBytes, byte[] passPhraseAsBytes, int iterations)
         {
-
             byte iterationSetting;
             int saltLength;
             int ivLength = 16;

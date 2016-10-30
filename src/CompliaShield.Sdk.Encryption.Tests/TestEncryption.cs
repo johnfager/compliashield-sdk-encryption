@@ -18,7 +18,8 @@ namespace CompliaShield.Sdk.Cryptography.Tests
     using Org.BouncyCastle.Crypto.Parameters;
     using Org.BouncyCastle.Security;
     using Encryption.Keys;
-    
+    using System.Security;
+    using Extensions;
 
     [TestClass]
     public class TestEncryption : _baseTest
@@ -261,8 +262,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
                 var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
 
                 var bytes = System.Text.Encoding.UTF8.GetBytes(stringToEncrypt);
-
-                // base 64
+    
                 var encryptedBytes = AesEncryptor.Encrypt1000(bytes, newKey);
                 var decryptedBytes = AesEncryptor.Decrypt(encryptedBytes, newKey);
 
@@ -271,6 +271,10 @@ namespace CompliaShield.Sdk.Cryptography.Tests
                 var decryptedString = System.Text.Encoding.UTF8.GetString(decryptedBytes);
                 Assert.AreEqual(stringToEncrypt, decryptedString);
 
+                var newKeyAsSecureString = newKey.ToSecureString();
+                var encryptedBytes2 = AesEncryptor.Encrypt1000(bytes, newKeyAsSecureString);
+                var decryptedBytes2 = AesEncryptor.Decrypt(encryptedBytes2, newKeyAsSecureString);
+                Assert.IsTrue(decryptedBytes2.SequenceEqual(bytes));
 
             }
         }
