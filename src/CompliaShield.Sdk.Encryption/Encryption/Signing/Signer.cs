@@ -10,6 +10,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
     using Extensions;
     using Utilities;
     using Hashing;
+    using System.Diagnostics;
 
     public class Signer
     {
@@ -70,7 +71,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
 
 #if DEBUG
             var hashHex = hashedBytes.ToHexString();
-            Console.WriteLine("Signing\t" + hashHex + "\t" + algorithm);
+            Trace.WriteLine("Signing\t" + hashHex + "\t" + algorithm);
 #endif
 
             byte[] signedHash = null;
@@ -104,7 +105,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
                 throw new NotImplementedException(_encoding.ToString());
             }            
 #if DEBUG
-            Console.WriteLine("Signed\t" + hashHex + "\t" + algorithm + "\tresult\t" + res2);
+            Trace.WriteLine("Signed\t" + hashHex + "\t" + algorithm + "\tresult\t" + res2);
 #endif
             return new Tuple<byte[], string>(signedHash, res2);
         }

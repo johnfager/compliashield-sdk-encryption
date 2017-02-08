@@ -103,7 +103,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             this.PublicMetadata["x-serialization-method"] = "json-to-binary-v1";
             this.PublicMetadata["x-serialization-object"] = "AsymmetricallyEncryptedObject";
             var json = Serializer.SerializeToJson(this); // removes the class specific typing
-            Console.WriteLine(json);
+            //Console.WriteLine(json);
             return Serializer.SerializeToByteArray(json);
         }
 

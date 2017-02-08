@@ -10,6 +10,7 @@ namespace CompliaShield.Sdk.Cryptography.Hashing
     using System.Threading.Tasks;
     using CompliaShield.Sdk.Cryptography.Extensions;
     using CompliaShield.Sdk.Cryptography.Utilities;
+    using System.Diagnostics;
 
     public class BasicHasher
     {
@@ -180,7 +181,7 @@ namespace CompliaShield.Sdk.Cryptography.Hashing
             {
                 var exMsg = string.Format("input '{0}' is not a valid hex or base64 string.", input);
 #if DEBUG
-                Console.WriteLine(exMsg);
+                Trace.WriteLine(exMsg);
 #endif
                 throw new FormatException(exMsg, ex);
             }

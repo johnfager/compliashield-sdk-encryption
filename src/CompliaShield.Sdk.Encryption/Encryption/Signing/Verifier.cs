@@ -11,6 +11,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
     using Utilities;
     using Hashing;
     using Keys;
+    using System.Diagnostics;
 
     public class Verifier
     {
@@ -60,7 +61,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
 #if DEBUG
             var hashHex = hashedBytes.ToHexString();
             var signedHash = signedBytes.ToHexString();
-            Console.WriteLine("VerifyHash\t" + hashHex + "\t" + algorithm + "\tsig\t" + signedHash + "\tresult\t" + isValid.ToString().ToLower());
+            Trace.WriteLine("VerifyHash\t" + hashHex + "\t" + algorithm + "\tsig\t" + signedHash + "\tresult\t" + isValid.ToString().ToLower());
 #endif
 
             return isValid;
@@ -75,7 +76,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Signing
             var isValid = _publicKey.VerifyHash(hashedBytes, algorithm, signedBytes);
 #if DEBUG
             var hashHex = hashedBytes.ToHexString();
-            Console.WriteLine("VerifyHash\t" + hashHex + "\t" + algorithm + "\tsig\t" + signedHash + "\tresult\t" + isValid.ToString().ToLower());
+            Trace.WriteLine("VerifyHash\t" + hashHex + "\t" + algorithm + "\tsig\t" + signedHash + "\tresult\t" + isValid.ToString().ToLower());
 #endif
             return isValid;
         }

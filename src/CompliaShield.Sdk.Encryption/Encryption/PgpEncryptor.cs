@@ -107,7 +107,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
                 }
             }
         }
-
+        
         /// <summary>
         /// Encrypts data using a PGP public key and returns a byte array.
         /// </summary>
@@ -480,11 +480,11 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             // we want to Generate compressed data. This might be a user option later,
             // in which case we would pass in bOut.
             Stream pOut = lData.Open(
-            cos,                    // the compressed output stream
-            PgpLiteralData.Binary,
-            fileName,               // "filename" to store
-            clearData.Length,       // length of clear data
-            DateTime.UtcNow         // current time
+                cos,                    // the compressed output stream
+                PgpLiteralData.Binary,
+                fileName,               // "filename" to store
+                clearData.Length,       // length of clear data
+                DateTime.UtcNow         // current time
             );
 
             pOut.Write(clearData, 0, clearData.Length);

@@ -23,6 +23,8 @@ _todo_*
 .vs/
 z_dep*
 
+
+
 #################
 ## Visual Studio
 #################
@@ -125,7 +127,7 @@ publish/
 
 # NuGet Packages Directory
 ## TODO: If you have NuGet Package Restore enabled, uncomment the next line
-#packages/
+packages/
 
 # Windows Azure Build Output
 csx
