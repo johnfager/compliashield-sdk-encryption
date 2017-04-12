@@ -51,7 +51,34 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public override byte[] Reference { get; set; }
 
-        public override AsymmetricStrategyOption AsymmetricStrategy { get; set; }
+        private AsymmetricStrategyOption _asymmetricStrategy;
+
+        public override AsymmetricStrategyOption AsymmetricStrategy
+        {
+            // NOTE: Typo of Aes256_200000 was removed but is preserved as obsolete
+            get
+            {
+#pragma warning disable 0618
+                if (_asymmetricStrategy == AsymmetricStrategyOption.Aes256_200000)
+                {
+                    _asymmetricStrategy = AsymmetricStrategyOption.Aes256_20000;
+                }
+#pragma warning restore 0618
+                return _asymmetricStrategy;
+            }
+            set
+            {
+#pragma warning disable 0618
+                if (value == AsymmetricStrategyOption.Aes256_200000)
+                {
+                    value = AsymmetricStrategyOption.Aes256_20000;
+                }
+#pragma warning restore 0618
+                _asymmetricStrategy = value;
+
+            }
+        }
+
 
         public override void LoadFromByteArray(byte[] input)
         {

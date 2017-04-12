@@ -137,6 +137,8 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             var json = Encoding.UTF8.GetString(bytes);
             var asymEncObj = Serializer.DeserializeFromJson<AsymmetricallyEncryptedObject>(json);
 
+
+
             // deserialize the object
             var asymEnc = new AsymmetricEncryptor();
             plainBytes = (byte[])await asymEnc.DecryptObjectAsync(asymEncObj, privateKey1, privateKey2);
@@ -279,21 +281,22 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
             string passPhrase = null;
             string passPhrase2 = null;
 
+            var cryptoSvc = RNGCryptoServiceProvider.Create();
+
             if (this.AsymmetricStrategy == AsymmetricStrategyOption.Legacy_Aes2)
             {
                 // legacy uses a string
                 var rand = new RandomGenerator();
-                passPhrase = rand.RandomPassword(pwLen); // pwMinLen, pwMaxLen);
+                passPhrase = rand.GenerateSecretCodeUrlSafe(pwLen, pwLen); // pwMinLen, pwMaxLen);
                 passPhraseAsBytes = Serializer.SerializeToByteArray(passPhrase);
                 if (publicKey2 != null)
                 {
-                    passPhrase2 = rand.RandomPassword(pwLen); // pwMinLen, pwMaxLen);
+                    passPhrase2 = rand.GenerateSecretCodeUrlSafe(pwLen, pwLen); // pwMinLen, pwMaxLen);
                     passPhrase2AsBytes = Serializer.SerializeToByteArray(passPhrase2);
                 }
             }
             else
             {
-                var cryptoSvc = RNGCryptoServiceProvider.Create();
                 passPhraseAsBytes = new byte[pwLen];
                 cryptoSvc.GetBytes(passPhraseAsBytes);
                 if (publicKey2 != null)
@@ -364,11 +367,11 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
                 asymEncObj.CipherText = cipher;
                 asymEncObj.AsymmetricStrategy = AsymmetricStrategyOption.Legacy_Aes2; // critical!!!
             }
-            else if(this.AsymmetricStrategy == AsymmetricStrategyOption.Aes256_200000)
+            else if (this.AsymmetricStrategy == AsymmetricStrategyOption.Aes256_20000)
             {
                 byte[] inputAsBytes = Serializer.SerializeToByteArray(input);
                 asymEncObj.Data = AesEncryptor.Encrypt20000(inputAsBytes, encryptionPassPhrase);
-                asymEncObj.AsymmetricStrategy = AsymmetricStrategyOption.Aes256_200000; // critical!!!
+                asymEncObj.AsymmetricStrategy = AsymmetricStrategyOption.Aes256_20000; // critical!!!
             }
             else if (this.AsymmetricStrategy == AsymmetricStrategyOption.Undefined || this.AsymmetricStrategy == AsymmetricStrategyOption.Aes256_1000)
             {
@@ -457,7 +460,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption
                 var decryptedObjectAsBytes = AesEncryptor.Decrypt(input.Data, passphraseAsBytes);
                 output = Serializer.DeserializeFromByteArray(decryptedObjectAsBytes);
             }
-            else if (input.AsymmetricStrategy == AsymmetricStrategyOption.Aes256_1000 || input.AsymmetricStrategy == AsymmetricStrategyOption.Aes256_5 || input.AsymmetricStrategy == AsymmetricStrategyOption.Aes256_200000)
+            else if (input.AsymmetricStrategy == AsymmetricStrategyOption.Aes256_1000 || input.AsymmetricStrategy == AsymmetricStrategyOption.Aes256_5 || input.AsymmetricStrategy == AsymmetricStrategyOption.Aes256_20000)
             {
                 // decryption knows the iterations
                 var decryptedObjectAsBytes = AesEncryptor.Decrypt(input.Data, passphraseAsBytes);

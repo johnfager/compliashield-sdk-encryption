@@ -25,64 +25,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
     [TestClass]
     public class TestEncryption : _baseTest
     {
-        [TestMethod]
-        public void GetSSHPublicKey()
-        {
-
-            var cert2 = LoadCertificate();
-
-            var ssh = X509CertificateHelper.ExportToPublicSshKey(cert2);
-            Console.WriteLine(ssh);
-
-            //var publicKey = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(cert2);
-            //RSAParameters parameters = publicKey.ExportParameters(false);
-            //byte[] exponet = parameters.Exponent;
-            //byte[] modulus = parameters.Modulus;
-
-
-            //var byte1 = Encoding.ASCII.GetBytes("ssh-rsa");
-            //var output = exponet.Concat(modulus);  // byte1.Concat(exponet).Concat(modulus);
-
-            //var b64 = "ssh-rsa " + Convert.ToBase64String(output.ToArray());
-            ////Console.WriteLine(b64);
-
-
-            //RsaKeyParameters r = DotNetUtilities.GetRsaPublicKey(parameters);
-
-            //byte[] sshrsa_bytes = Encoding.Default.GetBytes("ssh-rsa");
-            //byte[] n = r.Modulus.ToByteArray();
-            //byte[] e = r.Exponent.ToByteArray();
-
-            //string buffer64;
-            //using (MemoryStream ms = new MemoryStream())
-            //{
-            //    ms.Write(ToBytes(sshrsa_bytes.Length), 0, 4);
-            //    ms.Write(sshrsa_bytes, 0, sshrsa_bytes.Length);
-            //    ms.Write(ToBytes(e.Length), 0, 4);
-            //    ms.Write(e, 0, e.Length);
-            //    ms.Write(ToBytes(n.Length), 0, 4);
-            //    ms.Write(n, 0, n.Length);
-            //    ms.Flush();
-            //    buffer64 = Convert.ToBase64String(ms.ToArray());
-            //}
-
-            //var publicSsh = string.Format("ssh-rsa {0}", buffer64);
-            //Console.WriteLine(publicSsh);
-
-
-        }
-
-        private static byte[] ToBytes(int i)
-        {
-            byte[] bts = BitConverter.GetBytes(i);
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bts);
-            }
-            return bts;
-        }
-
-
+       
         [TestMethod]
         public void TestAsymmetricallyEncryptedBackupObject()
         {
@@ -93,7 +36,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
             var stringToEncrypt = Guid.NewGuid().ToString("N") + ":* d’une secrétairE chargée des affaires des étudiants de la section";
 
-            var encryptor = new AsymmetricEncryptor() { AsymmetricStrategy = AsymmetricStrategyOption.Aes256_200000 };
+            var encryptor = new AsymmetricEncryptor() { AsymmetricStrategy = AsymmetricStrategyOption.Aes256_20000 };
 
             var asymEncObj = encryptor.EncryptObjectAsync(stringToEncrypt, publicKey).GetAwaiter().GetResult();
             asymEncObj.PublicMetadata = new Dictionary<string, string>();
@@ -475,8 +418,7 @@ namespace CompliaShield.Sdk.Cryptography.Tests
 
             var publicKey = new X509CertificatePublicKey(cert2);
             var privateKey = new X509Certificate2KeyEncryptionKey(cert2);
-
-            int length = 100;
+            
             var rand = new RandomGenerator();
 
             //for (int i = 0; i < length; i++)

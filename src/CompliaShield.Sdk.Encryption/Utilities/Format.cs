@@ -43,7 +43,7 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
                 value = null;
                 return false;
             }
-        }
+        }     
 
         private static readonly Regex r = new Regex(@"^[0-9A-Fa-f\r\n]+$");
 

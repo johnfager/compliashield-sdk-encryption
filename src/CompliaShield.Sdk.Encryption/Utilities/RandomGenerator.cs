@@ -36,17 +36,30 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
 
         #endregion
 
+        /// <summary>
+        /// Uses RNGCryptoServiceProvider to gnerate a Base64 code that is then translated to JWT format.  
+        /// </summary>
+        /// <param name="minLength"></param>
+        /// <param name="maxLength"></param>
+        /// <returns></returns>
         public string GenerateSecretCodeUrlSafe(int minLength, int maxLength)
         {
-            var random = new RandomGenerator();
-            var length = random.RandomNumber(minLength, maxLength);
+            var length = this.RandomNumber(minLength, maxLength);
             var cryptoRandomDataGenerator = new RNGCryptoServiceProvider();
             byte[] buffer = new byte[length];
             cryptoRandomDataGenerator.GetBytes(buffer);
-            string uniq = Convert.ToBase64String(buffer).Replace('+', '-').Replace('/', '-').TrimEnd('=').Trim('-');
-            return uniq;
+            return JsonWebTokenUtility.Base64UrlEncodeForJson(buffer);
         }
 
+        /// <summary>
+        /// Returns a Base64 equivalent of a string created from GenerateSecretCodeUrlSafe or a JWT format.
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public string SecretCodeUrlSafeToBase64(string code)
+        {
+            return JsonWebTokenUtility.UrlEncodedToBase64(code);
+        }
 
         public string RandomString(int size)
         {
@@ -86,8 +99,7 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
             return GenerateRandomFromAllowedValues(chars, size);
         }
-
-
+        
         public string RandomLettersUpper(int size)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

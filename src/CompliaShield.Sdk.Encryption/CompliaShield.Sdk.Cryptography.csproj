@@ -64,6 +64,7 @@
     <Compile Include="Encryption\SerializationHelpers\StringDictionaryCaseInsensitive.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Hashing\BasicHasherAlgorithms.cs" />
+    <Compile Include="Utilities\JsonWebTokenUtility.cs" />
     <Compile Include="Utilities\RSACryptoServiceProviderHelper.cs" />
     <Compile Include="Utilities\StringWriterWithEncoding.cs" />
     <Compile Include="X509Certificates\CertificatePolicy.cs" />
