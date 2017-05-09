@@ -12,11 +12,17 @@ namespace CompliaShield.Sdk.Cryptography.Utilities
 
     public class RSACryptoServiceProviderHelper
     {
+
         public static string ExportPublicKey(RSACryptoServiceProvider rsa)
+        {
+            var parameters = rsa.ExportParameters(false);
+            return ExportPublicKey(parameters);
+        }
+
+        public static string ExportPublicKey(RSAParameters parameters)
         {
             using (TextWriter outputStream = new StringWriter())
             {
-                var parameters = rsa.ExportParameters(false);
                 using (var stream = new MemoryStream())
                 {
                     var writer = new BinaryWriter(stream);

@@ -10,7 +10,7 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
         string KeyLocator { get; set; }
 
         string Actor { get; set; }
-
+        
         string KeyId { get; }
 
         DateTime NotBefore { get; }

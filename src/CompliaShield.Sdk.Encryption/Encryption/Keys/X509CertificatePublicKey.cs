@@ -191,7 +191,12 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
                 throw new InvalidOperationException("There is no PublicKey");
             }
 
-            var fOAEP = false;
+            if (this.NotAfter < DateTime.UtcNow)
+            {
+                throw new EncryptionException($"Operation is not allowed on expired key; Key '{this.Actor}/{this.KeyId}'.");
+            }
+
+            var fOAEP = true; // changed to more modern standard 2017/05/08
             var rsa = X509CertificateHelper.GetRSACryptoServiceProviderFromPublicKey(_x5092);
             var encrypted = await Task.FromResult(rsa.Encrypt(key, fOAEP));
             return encrypted;

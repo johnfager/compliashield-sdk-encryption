@@ -63,6 +63,10 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
         public async Task<Tuple<byte[], string>> SignAsync(byte[] digest, string algorithm, CancellationToken token)
         {
             this.EnsureUsable();
+            if (this.NotAfter < DateTime.UtcNow)
+            {
+                throw new EncryptionException($"Operation is not allowed on expired key; Key '{this.Actor}/{this.KeyId}'.");
+            }
 
             if (digest == null || !digest.Any())
             {
@@ -81,6 +85,10 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
         public async Task<Tuple<byte[], string>> SignAsync(string hex)
         {
             this.EnsureUsable();
+            if (this.NotAfter < DateTime.UtcNow)
+            {
+                throw new EncryptionException($"Operation is not allowed on expired key; Key '{this.Actor}/{this.KeyId}'.");
+            }
             var crypto = this.GetRSACryptoServiceProvider();
             var signer = new Signing.Signer(crypto);
             var algorithm = BasicHasher.GetNormalAlgorithm(hex);
@@ -98,9 +106,22 @@ namespace CompliaShield.Sdk.Cryptography.Encryption.Keys
 
             var algorithm = this.GetRSACryptoServiceProvider();
             byte[] keyOut;
+            Exception exception1 = null;
             try
             {
-                keyOut = await Task.FromResult(algorithm.Decrypt(encryptedKey, false));
+                // prefer fOAEP true, more modern.
+                keyOut = await Task.FromResult(algorithm.Decrypt(encryptedKey, fOAEP: true));
+                return keyOut;
+            }
+            catch (Exception ex)
+            {
+                // could be caused by fOAEP: false from legacy encryption
+                exception1 = ex;
+            }
+            // fallback to fOAEP legacy
+            try
+            {
+                keyOut = await Task.FromResult(algorithm.Decrypt(encryptedKey, fOAEP: false));
             }
             catch (Exception ex)
             {
