@@ -13,16 +13,26 @@ namespace CompliaShield.Sdk.Cryptography.Hashing
     /// </summary>
     public static class HasherRfc2898
     {
-        private const int PBKDF2IterCount = 1000; // default for Rfc2898DeriveBytes
         private const int PBKDF2SubkeyLength = 256 / 8; // 256 bits
         private const int SaltSize = 128 / 8; // 128 bits
+
+        [Obsolete("Legacy .NET implementation uses only 1,000 hashes. 10,000 is the recommended minimum.")]
+        public static string HashValue(string input)
+        {
+            return HashValue(input, 1000);
+        }
+
+        public static string HashValue10000(string input)
+        {
+            return HashValue(input, 10000);
+        }
 
         /// <summary>
         /// Returns an RFC 2898 hash value for the specified password.
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public static string HashValue(string input)
+        public static string HashValue(string input, int interations)
         {
             byte[] salt;
             byte[] buffer2;
@@ -30,19 +40,30 @@ namespace CompliaShield.Sdk.Cryptography.Hashing
             {
                 throw new ArgumentNullException("input");
             }
-            using (Rfc2898DeriveBytes bytes = new Rfc2898DeriveBytes(input, 0x10, 0x3e8))
+            using (Rfc2898DeriveBytes bytes = new Rfc2898DeriveBytes(input, SaltSize, interations))
             {
                 salt = bytes.Salt;
-                buffer2 = bytes.GetBytes(0x20);
+                buffer2 = bytes.GetBytes(PBKDF2SubkeyLength);
             }
-            byte[] dst = new byte[0x31];
-            Buffer.BlockCopy(salt, 0, dst, 1, 0x10);
-            Buffer.BlockCopy(buffer2, 0, dst, 0x11, 0x20);
+            byte[] dst = new byte[PBKDF2SubkeyLength + SaltSize + 1];
+            Buffer.BlockCopy(salt, 0, dst, 1, SaltSize);
+            Buffer.BlockCopy(buffer2, 0, dst, 1 + SaltSize, 32);
             return Convert.ToBase64String(dst);
         }
 
-        // hashedPassword must be of the format of HashWithPassword (salt + Hash(salt+input)
+        [Obsolete("Legacy .NET implementation uses only 1,000 hashes. 10,000 is the recommended minimum.")]
         public static bool VerifyHashedValues(string hashedValue, string input)
+        {
+            return VerifyHashedValues(hashedValue, input, 1000);
+        }
+
+        public static bool VerifyHashedValues10000(string hashedValue, string input)
+        {
+            return VerifyHashedValues(hashedValue, input, 10000);
+        }
+
+        // hashedPassword must be of the format of HashWithPassword (salt + Hash(salt+input)
+        public static bool VerifyHashedValues(string hashedValue, string input, int interations)
         {
             if (hashedValue == null)
             {
@@ -69,14 +90,14 @@ namespace CompliaShield.Sdk.Cryptography.Hashing
             Buffer.BlockCopy(hashedPasswordBytes, 1 + SaltSize, storedSubkey, 0, PBKDF2SubkeyLength);
 
             byte[] generatedSubkey;
-            using (var deriveBytes = new Rfc2898DeriveBytes(input, salt, PBKDF2IterCount))
+            using (var deriveBytes = new Rfc2898DeriveBytes(input, salt, interations))
             {
                 generatedSubkey = deriveBytes.GetBytes(PBKDF2SubkeyLength);
             }
             return ByteArraysEqual(storedSubkey, generatedSubkey);
         }
 
-        
+
         // Compares two byte arrays for equality. The method is specifically written so that the loop is not optimized.
         private static bool ByteArraysEqual(byte[] a, byte[] b)
         {

@@ -29,5 +29,42 @@ namespace CompliaShield.Sdk.Cryptography.Tests
             hashed = BasicHasher.GetSha256Hash(toHash);
             Assert.AreEqual(expectedHash, hashed);
         }
+
+
+        [TestMethod]
+        public void TestHasherRfc2898()
+        {
+
+            for (int i = 0; i < 10; i++)
+            {
+                var toHash = "pandacat--" + Guid.NewGuid().ToString();
+                var hashed = HasherRfc2898.HashValue(toHash);
+                Assert.IsTrue(HasherRfc2898.VerifyHashedValues(hashed, toHash));
+            }
+
+            var toHash2 = "WUtNSQMd2lviypzb5JUS2Eo7FmA0lLBGEScohGGwBhL__3B3rvq5Za_9gZMts2TaCLSJ0Jth";
+            var hashed2 = "ABNrkf5tB5cHm4E5QffIcVMg0iq5uiDSiTswp0viukDzzJn0fu3xcG/o31rL0ARz5w==";
+            Assert.IsTrue(HasherRfc2898.VerifyHashedValues(hashed2, toHash2));
+
+            for (int i = 0; i < 10; i++)
+            {
+                var toHash = "pandacat--" + Guid.NewGuid().ToString() + Guid.NewGuid();
+                var hashed = HasherRfc2898.HashValue(toHash, 100000);
+                Assert.IsTrue(HasherRfc2898.VerifyHashedValues(hashed, toHash, 100000));
+                Assert.IsFalse(HasherRfc2898.VerifyHashedValues(hashed, toHash + "a", 100000));
+            }
+
+
+            for (int i = 0; i < 100; i++)
+            {
+                var toHash = "pandacat--" + Guid.NewGuid().ToString() + Guid.NewGuid();
+                var hashed = HasherRfc2898.HashValue10000(toHash);
+                Assert.IsTrue(HasherRfc2898.VerifyHashedValues10000(hashed, toHash));
+                Assert.IsFalse(HasherRfc2898.VerifyHashedValues10000(hashed, toHash + "a"));
+            }
+
+
+
+        }
     }
 }

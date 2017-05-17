@@ -16,11 +16,11 @@
 # Specify the Version Number to use for the NuGet package. If not specified, the version number of the assembly being packed will be used.
 # NuGet version number guidance: https://docs.nuget.org/docs/reference/versioning and the Semantic Versioning spec: http://semver.org/
 # e.g. "" (use assembly's version), "1.2.3" (stable version), "1.2.3-alpha" (prerelease version).
-$versionNumber = "1.0.3-beta"
+$versionNumber = "1.0.4.1"
 
 # Specify any Release Notes for this package. 
 # These will only be included in the package if you have a .nuspec file for the project in the same directory as the project file.
-$releaseNotes = "Removed KeyId parameter for asymmetric encryption, removed PEM and public key methods, and added use of WrapKeyAsync."
+$releaseNotes = "CompliaShield encryption SDK."
 
 # Specify a specific Configuration and/or Platform to only create a NuGet package when building the project with this Configuration and/or Platform.
 #	e.g. $configuration = "Release"

@@ -36,8 +36,8 @@
       <HintPath>..\packages\BouncyCastle.1.8.1\lib\BouncyCastle.Crypto.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\..\vdpbase\JFM.VdpWeb\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -98,7 +98,9 @@
     <Compile Include="Utilities\RegExPatterns.cs" />
     <Compile Include="Utilities\Serializer.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="_CreateNewNuGetPackage\DoNotModify\NuGet.exe" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="_CreateNewNuGetPackage\Config.ps1" />
@@ -106,9 +108,6 @@
     <None Include="_CreateNewNuGetPackage\DoNotModify\New-NuGetPackage.ps1" />
     <None Include="_CreateNewNuGetPackage\DoNotModify\UploadNuGetPackage.ps1" />
     <None Include="_CreateNewNuGetPackage\RunMeToUploadNuGetPackage.cmd" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="_CreateNewNuGetPackage\DoNotModify\NuGet.exe" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
